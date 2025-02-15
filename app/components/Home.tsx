@@ -1,8 +1,8 @@
 'use client'
 
-import CardGrid from '@/components/CardGrid'
-import AppLogo from '@/components/Logo'
-import AppMenu from '@/components/Menu'
+import CardGrid from '@/app/components/CardGrid'
+import AppLogo from '@/app/components/Logo'
+import AppMenu from '@/app/components/Menu'
 import { Menu, Website } from '@/services/menu'
 import { Layout } from 'antd'
 const { Sider, Content } = Layout
