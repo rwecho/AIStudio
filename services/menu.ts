@@ -4,6 +4,13 @@ export interface Menu {
   subMenus: Menu[]
 }
 
+export interface Language {
+  language: string
+  description: string
+  title: string
+  detail: string
+}
+
 export interface Website {
   id: number
   title: string
@@ -13,6 +20,6 @@ export interface Website {
   enabled: boolean
   created_at: string
   screenshot_key: string
-  languages: string[]
+  languages: Language[]
   categories: string
 }
