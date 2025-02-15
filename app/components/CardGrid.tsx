@@ -13,7 +13,27 @@ const AppCard = ({ websites }: { websites: Website[] }) => {
     }
     return result
   }
-  const groupItems = group(websites, 5)
+
+  // Group websites into columns, xl: 5, lg: 4, md: 3, sm: 2, xs: 1
+
+  const [cols, setCols] = React.useState(5)
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth
+      if (width >= 1200) setCols(5)      // xl
+      else if (width >= 992) setCols(4)   // lg
+      else if (width >= 768) setCols(3)   // md
+      else if (width >= 576) setCols(2)   // sm
+      else setCols(1)                     // xs
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const groupItems = group(websites, cols)
   return (
     <Space align="start">
       {groupItems.map((group, index) => (
@@ -22,30 +42,30 @@ const AppCard = ({ websites }: { websites: Website[] }) => {
             <Card
               hoverable
               key={index}
-              style={{ width: 300 }}
+              style={{ width: `${100/cols}%`, minWidth: 280, maxWidth: 400 }}
               cover={<ScreenShot screenshot_key={item.screenshot_key}></ScreenShot>}
               actions={[
-                <a key={'view'} href={item.url} target="_blank" rel="noopener noreferrer">
-                  浏览
-                </a>,
+              <a key={'view'} href={item.url} target="_blank" rel="noopener noreferrer">
+                浏览
+              </a>,
               ]}
             >
               <Meta
-                title={item.title}
-                description={
-                  <>
-                    <div>{item.description}</div>
-                    <Space className="mt-2" wrap>
-                      {item.tags
-                        ?.filter((o: string) => o != 'ai')
-                        .map((tag: string) => (
-                          <Tag key={tag} className="mr-2 text-xs text-gray-500">
-                            #{tag}
-                          </Tag>
-                        ))}
-                    </Space>
-                  </>
-                }
+              title={item.title}
+              description={
+                <>
+                <div>{item.description}</div>
+                <Space className="mt-2" wrap>
+                  {item.tags
+                  ?.filter((o: string) => o != 'ai')
+                  .map((tag: string) => (
+                    <Tag key={tag} className="mr-2 text-xs text-gray-500">
+                    #{tag}
+                    </Tag>
+                  ))}
+                </Space>
+                </>
+              }
               />
             </Card>
           ))}
