@@ -1,4 +1,4 @@
-// 'use client'
+'use client'
 import React from 'react'
 import { Menu } from 'antd'
 import {
@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons'
 
 import { Menu as MenuType } from '@/services/menu'
+import { useWebsiteContext } from '@/app/contexts/WebsiteContext'
 
 // Icon mapping for categories
 const iconMap: { [key: string]: React.ReactNode } = {
@@ -30,7 +31,9 @@ const iconMap: { [key: string]: React.ReactNode } = {
   竞赛: <TrophyOutlined />,
 }
 
-const AppMenu = ({ menus }: { menus: MenuType[] }) => {
+const AppMenu = () => {
+  const { menus } = useWebsiteContext()
+
   const menuItems = menus.map((menu) => ({
     key: menu.id,
     icon: iconMap[menu.name],

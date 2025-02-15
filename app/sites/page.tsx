@@ -1,4 +1,4 @@
-import Sites from './components/Site'
+import Sites from './components/Sites'
 import supabase from '@/lib/initSupabase'
 
 export default async function SitesPage() {

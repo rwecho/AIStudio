@@ -6,7 +6,7 @@ export interface Menu {
 
 export interface Website {
   id: number
-  name: string
+  title: string
   description: string
   url: string
   tags: string[]

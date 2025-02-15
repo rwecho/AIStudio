@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { motion } from 'framer-motion'
 import { Link } from 'next-view-transitions'
 import Home from './components/Home'
 import supabase from '@/lib/initSupabase'
