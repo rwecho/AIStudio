@@ -19,16 +19,16 @@ import { useWebsiteContext } from '@/app/contexts/WebsiteContext'
 
 // Icon mapping for categories
 const iconMap: { [key: string]: React.ReactNode } = {
-  工具推荐: <AppstoreOutlined />,
-  大模型: <RobotOutlined />,
-  工具集: <ToolOutlined />,
-  开发者社区: <CodeOutlined />,
-  图像工具: <PictureOutlined />,
-  视频工具: <VideoCameraOutlined />,
-  办公工具: <FileTextOutlined />,
-  商业服务: <ShopOutlined />,
-  权威机构: <BankOutlined />,
-  竞赛: <TrophyOutlined />,
+  1: <AppstoreOutlined />,
+  2: <RobotOutlined />,
+  3: <ToolOutlined />,
+  4: <CodeOutlined />,
+  5: <PictureOutlined />,
+  6: <VideoCameraOutlined />,
+  7: <FileTextOutlined />,
+  8: <ShopOutlined />,
+  9: <BankOutlined />,
+  10: <TrophyOutlined />,
 }
 
 const AppMenu = () => {
@@ -36,7 +36,7 @@ const AppMenu = () => {
 
   const menuItems = menus.map((menu) => ({
     key: menu.id,
-    icon: iconMap[menu.name],
+    icon: iconMap[menu.id],
     label: menu.name,
     children: menu.subMenus.map((sub) => ({
       key: sub.id,
@@ -48,7 +48,6 @@ const AppMenu = () => {
 
   return (
     <Menu
-      style={{ width: 256 }}
       selectedKeys={selectedKeys}
       defaultOpenKeys={[menuItems[0].key.toString()]}
       mode="inline"
