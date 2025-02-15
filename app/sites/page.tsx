@@ -1,15 +1,18 @@
 import Sites from './components/Sites'
+import { SitesProvider } from '../contexts/SitesContext'
 import supabase from '@/lib/initSupabase'
 
+async function getSites() {
+  const { data: sites } = await supabase.from('websites').select('*')
+  return sites || []
+}
+
 export default async function SitesPage() {
-  const { data: sites, error } = await supabase
-    .from('websites')
-    .select('*')
-    .order('id', { ascending: false })
+  const defaultSites = await getSites()
 
-  if (error) {
-    throw error
-  }
-
-  return <Sites defaultSites={sites}></Sites>
+  return (
+    <SitesProvider defaultSites={defaultSites}>
+      <Sites />
+    </SitesProvider>
+  )
 }

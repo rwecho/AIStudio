@@ -5,6 +5,8 @@ import type { ColumnsType } from 'antd/es/table'
 import supabase from '@/lib/initClientSupabase'
 import ButtonGroup from 'antd/es/button/button-group'
 import Image from 'next/image'
+import { withTheme } from '@/app/hoc/withTheme'
+import { useSites } from '@/app/contexts/SitesContext'
 
 interface Website {
   id: number
@@ -16,8 +18,8 @@ interface Website {
   created_at: string
 }
 
-export default function Sites({ defaultSites }: { defaultSites: Website[] }) {
-  const [sites, setSites] = useState<Website[]>(defaultSites)
+function Sites() {
+  const { sites, setSites } = useSites()
   const [loading, setLoading] = useState(true)
 
   const [crawling, setCrawling] = useState(false)
@@ -29,9 +31,8 @@ export default function Sites({ defaultSites }: { defaultSites: Website[] }) {
   const [form] = Form.useForm()
 
   useEffect(() => {
-    setSites(defaultSites)
     setLoading(false)
-  }, [defaultSites])
+  }, [sites])
 
   const showModal = (record?: Website) => {
     setEditingRecord(record || null)
@@ -263,3 +264,5 @@ export default function Sites({ defaultSites }: { defaultSites: Website[] }) {
     </div>
   )
 }
+
+export default withTheme(Sites)
