@@ -6,17 +6,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'os.alipayobjects.com',
-        port: '',
-        pathname: '/**',
-        search: '',
-      },
-      {
-        protocol: 'https',
-        hostname: 'gzvyrqvfenspzkvaqfsk.supabase.co',
-        port: '',
-        pathname: '',
-        search: '',
+        hostname: '**',
       },
     ],
   },
