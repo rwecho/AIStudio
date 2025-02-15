@@ -265,4 +265,4 @@ function Sites() {
   )
 }
 
-export default withTheme(Sites)
+export default withTheme(() => <div>123</div>)

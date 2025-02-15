@@ -21,7 +21,6 @@ const Home = ({ menus, websites, isDarkMode, toggleTheme }: HomeProps) => {
       <Layout
         style={{
           minHeight: '100vh',
-          background: isDarkMode ? '#141414' : '#ffffff',
         }}
       >
         <Sider width={256} theme={isDarkMode ? 'dark' : 'light'} className="relative">
@@ -46,8 +45,6 @@ const Home = ({ menus, websites, isDarkMode, toggleTheme }: HomeProps) => {
         <Content
           style={{
             padding: '24px',
-            background: isDarkMode ? '#141414' : '#ffffff',
-            color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)',
           }}
         >
           <WebsiteGallery />

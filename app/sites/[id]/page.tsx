@@ -1,6 +1,8 @@
 import { Website } from '@/services/menu'
 import Site from './components/Site'
 import { Metadata } from 'next'
+import { SizeContextProvider } from 'antd/es/config-provider/SizeContext'
+import { SiteProvider } from '@/app/contexts/SiteContext'
 
 async function getWebsite(id: string): Promise<Website> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sites/${id}`, {
@@ -66,10 +68,6 @@ export async function generateMetadata({
       creator: '@aistudiox',
       images: screenshot,
     },
-    viewport: {
-      width: 'device-width',
-      initialScale: 1,
-    },
     themeColor: '#ffffff',
     category: 'technology',
   }
@@ -85,5 +83,9 @@ export default async function WebsitePage({
   const resolvedParams = await params
   const website = await getWebsite(resolvedParams.id)
 
-  return <Site website={website}></Site>
+  return (
+    <SiteProvider defaultSite={website}>
+      <Site></Site>
+    </SiteProvider>
+  )
 }

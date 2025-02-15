@@ -3,6 +3,7 @@
 import { ConfigProvider, theme } from 'antd'
 import { useEffect, useState } from 'react'
 import type { WithThemeProps } from '../types/theme'
+import { Content } from 'antd/es/layout/layout'
 
 export const withTheme = <P extends WithThemeProps>(
   WrappedComponent: React.ComponentType<P>
@@ -33,7 +34,15 @@ export const withTheme = <P extends WithThemeProps>(
           },
         }}
       >
-        <WrappedComponent {...(props as P)} isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+        <div
+          className={` ${isDarkMode ? 'text-white/85' : 'text-black/85'}
+          ${isDarkMode ? 'bg-black' : 'bg-white'}
+          `}
+        >
+          <Content>
+            <WrappedComponent {...(props as P)} isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+          </Content>
+        </div>
       </ConfigProvider>
     )
   }

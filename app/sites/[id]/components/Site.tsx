@@ -1,11 +1,14 @@
 'use client'
-import { Website } from '@/services/menu'
+import { useSiteContext } from '@/app/contexts/SiteContext'
+import { withTheme } from '@/app/hoc/withTheme'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
 
-const Site = ({ website }: { website: Website }) => {
-  const screenshot = `/api/screenshot?key=${website.screenshot_key}`
+const SiteContent = () => {
+  const { site } = useSiteContext()
+  const screenshot = `/api/screenshot?key=${site.screenshot_key}`
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -23,7 +26,7 @@ const Site = ({ website }: { website: Website }) => {
           transition={{ delay: 0.2 }}
           className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent mb-6"
         >
-          {website.languages[0].title}
+          {site.languages[0].title}
         </motion.h1>
 
         <motion.p
@@ -31,7 +34,7 @@ const Site = ({ website }: { website: Website }) => {
           animate={{ opacity: 1 }}
           className="text-lg text-gray-400 "
         >
-          {website.languages[0].description}
+          {site.languages[0].description}
         </motion.p>
 
         <motion.div
@@ -42,7 +45,7 @@ const Site = ({ website }: { website: Website }) => {
         >
           <Image
             src={screenshot}
-            alt={website.languages[0].title}
+            alt={site.languages[0].title}
             width={768}
             height={432}
             placeholder="blur"
@@ -61,7 +64,7 @@ const Site = ({ website }: { website: Website }) => {
           className="mt-8"
         >
           <ReactMarkdown className="prose prose-invert prose-sm sm:prose-base lg:prose-lg prose-pre:bg-gray-800/50 prose-pre:border prose-pre:border-gray-700 prose-pre:rounded-lg prose-img:rounded-xl prose-headings:bg-gradient-to-r prose-headings:from-purple-400 prose-headings:to-pink-600 prose-headings:bg-clip-text prose-headings:text-transparent max-w-none">
-            {website.languages[0].detail}
+            {site.languages[0].detail}
           </ReactMarkdown>
         </motion.div>
       </motion.div>
@@ -69,4 +72,4 @@ const Site = ({ website }: { website: Website }) => {
   )
 }
 
-export default Site
+export default withTheme(SiteContent)
