@@ -15,10 +15,15 @@ async function getWebsite(id: string): Promise<Website> {
   return res.json()
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const website = await getWebsite(params.id)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const resolvedParams = await params
+  const website = await getWebsite(resolvedParams.id)
   const screenshot = `/api/screenshot?key=${website.screenshot_key}`
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/sites/${params.id}`
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/sites/${resolvedParams.id}`
 
   return {
     title: website.title,

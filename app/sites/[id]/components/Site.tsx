@@ -58,9 +58,11 @@ const Site = ({ website }: { website: Website }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6"
+          className="mt-8"
         >
-          <ReactMarkdown>{website.languages[0].detail}</ReactMarkdown>
+          <ReactMarkdown className="prose prose-invert prose-sm sm:prose-base lg:prose-lg prose-pre:bg-gray-800/50 prose-pre:border prose-pre:border-gray-700 prose-pre:rounded-lg prose-img:rounded-xl prose-headings:bg-gradient-to-r prose-headings:from-purple-400 prose-headings:to-pink-600 prose-headings:bg-clip-text prose-headings:text-transparent max-w-none">
+            {website.languages[0].detail}
+          </ReactMarkdown>
         </motion.div>
       </motion.div>
     </motion.div>
