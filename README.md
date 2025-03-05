@@ -1,60 +1,36 @@
-# AI 导航 - 探索人工智能的无限可能
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-**AI 导航** 是一个致力于帮助用户快速发现和探索人工智能领域资源的导航网站。我们旨在打造一个对 SEO 友好、用户体验至上的平台，让您轻松找到所需的 AI 知识、工具和网站。
+## Getting Started
 
-## 核心特性
+First, run the development server:
 
-*   **全面的 AI 资源**: 汇集了 AI 领域的各类资源，包括学习资料、行业资讯、实用工具和精选网站。
-*   **强大的搜索功能**:  通过关键词快速检索，精准定位您需要的 AI 内容。
-*   **清晰的分类导航**:  按照 AI 的不同领域进行分类，方便您系统地浏览和学习。
-*   **SEO 优化**:  采用先进的 SEO 技术，确保网站在搜索引擎中获得更高的排名，让更多用户发现我们的平台。
-*   **用户友好的界面**:  简洁直观的设计，带来流畅舒适的浏览体验。
-*   **持续更新**:  我们不断更新和完善网站内容，为您提供最新鲜、最全面的 AI 资源。
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## 技术栈
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-*   **Next.js**:  基于 React 的 Web 应用开发框架，提供卓越的性能和 SEO 支持。
-*   **Yarn**:  快速、可靠、安全的依赖管理工具。
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## 快速开始
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-1.  **安装依赖**:
+## Learn More
 
-    ```bash
-    yarn install
-    ```
+To learn more about Next.js, take a look at the following resources:
 
-2.  **运行开发服务器**:
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-    ```bash
-    yarn dev
-    ```
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-3.  **构建生产版本**:
+## Deploy on Vercel
 
-    ```bash
-    yarn build
-    ```
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-4.  **启动生产服务器**:
-
-    ```bash
-    yarn start
-    ```
-
-## 贡献指南
-
-欢迎参与 **AI 导航** 的建设！您可以：
-
-*   提交新的 AI 资源
-*   改进网站功能
-*   优化 SEO
-*   分享您的 AI 知识
-
-## 许可
-
-本项目采用 MIT 许可。
-
-## 联系我们
-
-如果您有任何问题或建议，请随时与我们联系。
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
