@@ -1,5 +1,10 @@
-export const getSites = async (catalog: string): Promise<Site[]> => {
-  const response = await fetch("/api/sites?catalog=" + catalog);
+export const getSites = async (
+  catalog: string,
+  filter: string
+): Promise<Site[]> => {
+  const response = await fetch(
+    "/api/sites?catalog=" + catalog + "&filter=" + filter
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch sites");
   }

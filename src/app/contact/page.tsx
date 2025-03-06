@@ -1,6 +1,23 @@
+"use client";
+import { Button, Form, Input } from "antd";
 import MainLayout from "../components/MainLayout";
+import TextArea from "antd/es/input/TextArea";
+import axios from "axios";
 
 const ContactPage = () => {
+  const handleFinish = async (values: {
+    name: string;
+    email: string;
+    message: string;
+  }) => {
+    debugger;
+    try {
+      await axios.post("/api/contact", values);
+      alert("感谢你的反馈！我们会尽快回复你。");
+    } catch (error) {
+      console.error("Failed to send message", error);
+    }
+  };
   return (
     <MainLayout>
       <div className="max-w-2xl mx-auto py-8">
@@ -17,50 +34,40 @@ const ContactPage = () => {
           .
         </p>
 
-        <form className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block mb-1">
-              Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              className="w-full p-2 border rounded"
-              placeholder="Your name"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="w-full p-2 border rounded"
-              placeholder="your.email@example.com"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="message" className="block mb-1">
-              Message
-            </label>
-            <textarea
-              id="message"
-              rows={4}
-              className="w-full p-2 border rounded"
-              placeholder="Your message"
-            ></textarea>
-          </div>
-
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        <Form layout="vertical" onFinish={handleFinish}>
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: "Please enter your name" }]}
           >
-            Send Message
-          </button>
-        </form>
+            <Input placeholder="Your name" />
+          </Form.Item>
+
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[
+              { required: true, message: "Please enter your email" },
+              { type: "email", message: "Please enter a valid email" },
+            ]}
+          >
+            <Input placeholder="your.email@example.com" />
+          </Form.Item>
+
+          <Form.Item
+            name="message"
+            label="Message"
+            rules={[{ required: true, message: "Please enter your message" }]}
+          >
+            <TextArea rows={4} placeholder="Your message" />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Send Message
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     </MainLayout>
   );

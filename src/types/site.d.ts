@@ -1,10 +1,10 @@
 interface Site {
-  id: string;
+  id: number;
   url: string;
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   tags: string[];
-  cover: string;
+  cover?: string;
   label?: string;
   createdAt: Date;
 }
