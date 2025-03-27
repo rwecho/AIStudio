@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import PostCard from "@/components/ui/PostCard";
 import { Card, Row, Col, Select, Input } from "antd";
 import { Pagination } from "antd";
+import PostRow from "@/components/ui/PostRow";
 
 interface SearchParams {
   page?: string;
@@ -50,37 +51,14 @@ export default async function PostsPage({
   //   const categories = await prisma.category.findMany();
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
-      <Card className="mb-6">
-        <div className="flex gap-4 mb-4">
-          {/* <Input.Search placeholder="搜索文章" style={{ width: 300 }} /> */}
-          {/* <Select
-            placeholder="选择分类"
-            style={{ width: 200 }}
-            options={categories.map((c) => ({
-              label: c.name,
-              value: c.id,
-            }))}
-          /> */}
-        </div>
-      </Card>
-
-      <Row gutter={[16, 16]}>
+    <div className="content">
+      <Col>
         {posts.map((post) => (
-          <Col xs={24} sm={12} md={8} lg={6} key={post.id}>
-            <PostCard post={post} />
-          </Col>
+          <Row key={post.id} style={{ marginBottom: "16px" }}>
+            <PostRow post={post} />
+          </Row>
         ))}
-      </Row>
-
-      <div className="mt-8 flex justify-center">
-        <Pagination
-          current={page}
-          pageSize={pageSize}
-          total={total}
-          showSizeChanger
-        />
-      </div>
+      </Col>
     </div>
   );
 }
