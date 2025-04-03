@@ -31,19 +31,13 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  height: 200px;
   overflow: hidden;
-  /* 最多4行 */
-  -webkit-box-orient: vertical;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
 }
 
 .content p {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #666;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.4rem;
 }
 
 .title {

@@ -49,7 +49,9 @@ export default function PostsPage() {
       <Col>
         {posts.map((post) => (
           <Row key={post.id} style={{ marginBottom: "16px" }}>
-            <PostRow post={post} />
+            <Col span={16}>
+              <PostRow post={post} />
+            </Col>
           </Row>
         ))}
         <div ref={loadingRef} className={styles.loadingWrapper}>

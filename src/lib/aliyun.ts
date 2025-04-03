@@ -26,6 +26,21 @@ export async function uploadToAliyun(
   }
 }
 
+// 获取文件url
+export async function getAliyunFileUrl(filePath: string): Promise<string> {
+  try {
+    debugger;
+    const client = createOSSClient();
+    const url = client.signatureUrl(filePath, {
+      expires: 60 * 60, // 1小时有效期
+    });
+    return url;
+  } catch (error) {
+    console.error("获取阿里云OSS文件URL失败:", error);
+    throw new Error("获取文件URL失败");
+  }
+}
+
 // 从阿里云 OSS 删除文件
 export async function deleteFromAliyun(filePath: string): Promise<void> {
   try {
