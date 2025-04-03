@@ -40,13 +40,13 @@ export default function Header() {
           </div>
         </div>
         <div className="nav-right">
-          {!isMobile && (
+          {/* {!isMobile && (
             <SearchBar
               className="search-box"
               size="middle"
               placeholder="搜索文章、标签..."
             />
-          )}
+          )} */}
         </div>
       </nav>
     </header>

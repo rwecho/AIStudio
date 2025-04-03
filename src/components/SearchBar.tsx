@@ -44,7 +44,7 @@ const SearchBar = ({
         placeholder={placeholder}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        onKeyPress={handleKeyPress}
+        onKeyUp={handleKeyPress}
         size={size}
         allowClear
       />
