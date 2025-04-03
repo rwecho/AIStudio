@@ -2,12 +2,8 @@
 
 import Link from "next/link";
 import { mainNavItems } from "@/constants/navigation";
-import { useIsMobile } from "@/hooks/useMedia";
-import SearchBar from "@/components/SearchBar";
 
 export default function Header() {
-  const isMobile = useIsMobile();
-
   return (
     <header className="header">
       <nav className="nav">
