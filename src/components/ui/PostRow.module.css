@@ -20,6 +20,11 @@
   object-fit: cover;
   border-radius: 8px;
 }
+.contentContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
 .content {
   flex: 1;
@@ -32,6 +37,13 @@
   -webkit-box-orient: vertical;
   display: -webkit-box;
   -webkit-line-clamp: 4;
+}
+
+.content p {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
 }
 
 .title {

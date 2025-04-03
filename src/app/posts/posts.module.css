@@ -1,0 +1,9 @@
+.container {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.loadingWrapper {
+  padding: 24px 0;
+  text-align: center;
+}

@@ -1,54 +1,48 @@
-import prisma from "@/lib/prisma";
-import PostCard from "@/components/ui/PostCard";
-import { Card, Row, Col, Select, Input } from "antd";
-import { Pagination } from "antd";
+"use client";
+import { useState, useEffect, useRef } from "react";
+import { Col, Row, Spin } from "antd";
 import PostRow from "@/components/ui/PostRow";
+import styles from "./posts.module.css";
+import { Post } from "@prisma/client";
 
-interface SearchParams {
-  page?: string;
-  pageSize?: string;
-  category?: string;
-  sort?: string;
-  search?: string;
-}
+export default function PostsPage() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const loadingRef = useRef(null);
 
-export default async function PostsPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
-  const page = Number(searchParams.page) || 1;
-  const pageSize = Number(searchParams.pageSize) || 12;
-  const search = searchParams.search || "";
-
-  const where = {
-    ...(search
-      ? {
-          OR: [
-            { title: { contains: search, mode: "insensitive" } },
-            { content: { contains: search, mode: "insensitive" } },
-          ],
-        }
-      : {}),
+  const loadMore = async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/posts?page=${page}&pageSize=10`);
+      const data = await res.json();
+      setPosts((prev) => [...prev, ...data.posts]);
+      setHasMore(data.posts.length === 10);
+      setPage((prev) => prev + 1);
+    } catch (error) {
+      console.error(error);
+    }
+    setLoading(false);
   };
 
-  const posts = await prisma.post.findMany({
-    // where,
-    take: pageSize,
-    skip: (page - 1) * pageSize,
-    orderBy: {
-      published: "desc",
-    },
-    include: {
-      //   category: true,
-    },
-  });
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.5 }
+    );
 
-  const total = await prisma.post.count({
-    // where
-  });
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current);
+    }
 
-  //   const categories = await prisma.category.findMany();
+    return () => observer.disconnect();
+  }, [page]);
 
   return (
     <div className="content">
@@ -58,6 +52,10 @@ export default async function PostsPage({
             <PostRow post={post} />
           </Row>
         ))}
+        <div ref={loadingRef} className={styles.loadingWrapper}>
+          {loading && <Spin size="large" />}
+          {!hasMore && <div>没有更多数据了</div>}
+        </div>
       </Col>
     </div>
   );

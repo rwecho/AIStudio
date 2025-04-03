@@ -12,11 +12,8 @@ export default async function NewsSection() {
       published: "desc",
     },
     where: {
-      published: {
-        gte: new Date(new Date().setHours(0, 0, 0, 0)),
-      },
       source: {
-        // not: null,
+        not: null,
         // equals: "ZaihuaNews-Telegram",
       },
     },

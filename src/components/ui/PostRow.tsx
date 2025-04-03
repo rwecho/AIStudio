@@ -26,12 +26,15 @@ const PostRow = ({ post }: { post: Post }) => {
           </div>
         )}
 
-        <div className={styles.content}>
+        <div className={styles.contentContainer}>
           <Title level={4} className={styles.title}>
             {title}
           </Title>
 
-          <div dangerouslySetInnerHTML={{ __html: content }}></div>
+          <div
+            className={styles.content}
+            dangerouslySetInnerHTML={{ __html: content }}
+          ></div>
 
           <Space className={styles.meta} size={16}>
             <Space>
@@ -48,7 +51,7 @@ const PostRow = ({ post }: { post: Post }) => {
             </Space>
           </Space>
           <div className={styles.tags}>
-            {post.tags?.map((tag, index) => (
+            {post.cate?.map((tag, index) => (
               <Tag key={index} color="blue">
                 {tag}
               </Tag>

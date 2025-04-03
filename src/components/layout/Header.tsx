@@ -4,9 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { mainNavItems } from "@/constants/navigation";
 import { useIsMobile } from "@/hooks/useMedia";
+import SearchBar from "@/components/SearchBar";
 
 export default function Header() {
-  const [searchQuery, setSearchQuery] = useState("");
   const isMobile = useIsMobile();
 
   return (
@@ -14,7 +14,8 @@ export default function Header() {
       <nav className="nav">
         <div className="logo-container">
           <div className="logo">
-            <span className="logo-triangle">▲</span>StudioX
+            <span className="logo-triangle">AI</span>StudioX
+            <div className="tagline">智能创作与AI社区</div>
           </div>
           <div className="nav-links">
             {mainNavItems.map((item) =>
@@ -41,15 +42,11 @@ export default function Header() {
         </div>
         <div className="nav-right">
           {!isMobile && (
-            <div className="search-box">
-              <span className="search-icon">🔍</span>
-              <input
-                type="text"
-                placeholder="搜索"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+            <SearchBar
+              className="search-box"
+              size="middle"
+              placeholder="搜索文章、标签..."
+            />
           )}
         </div>
       </nav>

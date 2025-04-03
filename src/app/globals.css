@@ -99,6 +99,13 @@ main {
   margin-right: 2px;
 }
 
+.tagline {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--secondary);
+  margin-left: 0.5rem;
+}
+
 .nav-links {
   display: flex;
   align-items: center;

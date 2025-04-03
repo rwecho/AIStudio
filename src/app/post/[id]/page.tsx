@@ -1,8 +1,24 @@
 import { parseHtml } from "@/utils/html";
 import { timeAgo } from "@/utils/formatDate";
-import { Card, Image, Tag, Space } from "antd";
+import { Card, Image, Tag, Space, Badge } from "antd";
 import Title from "antd/es/typography/Title";
 import prisma from "@/lib/prisma";
+import style from "./page.module.css";
+import ViewCounter from "@/components/post/ViewCounter";
+import LikeButton from "@/components/post/LikeButton";
+
+// 状态显示帮助函数
+const getStatusBadge = (status: string) => {
+  const statusMap: Record<string, { color: string; text: string }> = {
+    DRAFT: { color: "default", text: "草稿" },
+    PENDING: { color: "processing", text: "待审核" },
+    PUBLISHED: { color: "success", text: "已发布" },
+    REJECTED: { color: "error", text: "已拒绝" },
+    ARCHIVED: { color: "warning", text: "已归档" },
+  };
+
+  return statusMap[status] || { color: "default", text: status };
+};
 
 export default async function PostPage({ params }: { params: { id: string } }) {
   try {
@@ -11,7 +27,7 @@ export default async function PostPage({ params }: { params: { id: string } }) {
         id: params.id,
       },
       include: {
-        // category: true,
+        tags: true,
       },
     });
 
@@ -23,35 +39,56 @@ export default async function PostPage({ params }: { params: { id: string } }) {
       );
     }
 
+    // 使用服务端获取内容，不自动增加浏览量，让客户端组件处理
     const { title, content, firstImage } = parseHtml(post.content);
+    const statusInfo = getStatusBadge(post.status);
 
     return (
-      <div className="max-w-4xl mx-auto py-8 px-4">
+      <div className={style.article}>
         <Card>
-          {firstImage && (
-            <Image
-              src={firstImage}
-              alt={title}
-              style={{
-                maxWidth: "100%",
-                height: "auto",
-                marginBottom: "24px",
-              }}
-            />
-          )}
-          <Title>{title}</Title>
+          <div className="flex justify-between items-center mb-4">
+            <Title level={1} style={{ margin: 0 }}>
+              {title}
+            </Title>
+            <div className="flex flex-col items-end">
+              <Badge status={statusInfo.color as any} text={statusInfo.text} />
+              {post.isApproved && (
+                <Tag color="green" className="mt-1">
+                  已审核
+                </Tag>
+              )}
+              {post.isCleaned && (
+                <Tag color="blue" className="mt-1">
+                  已清理
+                </Tag>
+              )}
+            </div>
+          </div>
 
-          <Space className="mb-6">
-            {post.author && (
-              <span className="text-gray-600">作者: {post.author}</span>
+          <div className={style.imageContainer}>
+            {post.hasCoverImage && post.coverImage ? (
+              <Image
+                src={post.coverImage}
+                alt={title}
+                className={style.image}
+              />
+            ) : firstImage ? (
+              <Image src={firstImage} alt={title} className={style.image} />
+            ) : null}
+          </div>
+
+          <Space className="mb-4">
+            {post.author && <span>作者: {post.author}</span>}
+            {post.published && (
+              <span>{post.published && timeAgo(post.published)}</span>
             )}
-            <span className="text-gray-500">
-              {post.published && timeAgo(post.published)}
-            </span>
-            {/* {post.category && <Tag color="blue">{post.category.name}</Tag>} */}
-            {post.tags.map((tag: string) => (
-              <Tag key={tag}>{tag}</Tag>
-            ))}
+
+            {post.tags.length > 0 &&
+              post.tags.map((tag) => (
+                <Tag key={tag.id} color="blue">
+                  {tag.name}
+                </Tag>
+              ))}
           </Space>
 
           <div
@@ -59,9 +96,11 @@ export default async function PostPage({ params }: { params: { id: string } }) {
             dangerouslySetInnerHTML={{ __html: content }}
           />
 
-          <div className="mt-4 text-gray-500 text-sm">
-            <span>浏览: {post.views}</span>
-            <span className="ml-4">点赞: {post.likes}</span>
+          <div className="mt-4 text-gray-500 text-sm flex items-center">
+            <ViewCounter id={post.id} initialViews={post.views} />
+            <div className="ml-4">
+              <LikeButton id={post.id} initialLikes={post.likes} />
+            </div>
           </div>
         </Card>
       </div>
