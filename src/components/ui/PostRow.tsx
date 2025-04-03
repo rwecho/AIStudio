@@ -101,14 +101,14 @@ const PostRow = ({ post }: { post: Post }) => {
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeRaw, rehypeSanitize]}
               components={{
-                code({ _, inline, className, children, ...props }) {
+                code({ className, children, ...props }) {
                   const match = /language-(\w+)/.exec(className || "");
-                  return !inline && match ? (
+                  return match ? (
                     <SyntaxHighlighter
-                      style={vscDarkPlus}
+                      {...(props as any)}
                       language={match[1]}
                       PreTag="div"
-                      {...props}
+                      style={vscDarkPlus}
                     >
                       {String(children).replace(/\n$/, "")}
                     </SyntaxHighlighter>
