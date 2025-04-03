@@ -104,7 +104,7 @@ export default function SearchPage() {
 
   // 提取内容摘要（无HTML标签，截取适当长度）
   const getExcerpt = (content: string, maxLength = 150) => {
-    const { text } = parseHtml(content);
+    const { content: text } = parseHtml(content);
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + "...";
   };
@@ -121,7 +121,7 @@ export default function SearchPage() {
 
         {query && (
           <p className="text-gray-600">
-            搜索 "{query}" 的结果
+            搜索 {query} 的结果
             {results && `: 找到 ${results.pagination.totalCount} 个匹配项`}
           </p>
         )}

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { Card, Col, Row } from "antd";
+import { Col, Row } from "antd";
 import PostCard from "../ui/PostCard";
 
 export default async function NewsSection() {

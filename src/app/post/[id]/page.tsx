@@ -20,14 +20,16 @@ const getStatusBadge = (status: string) => {
   return statusMap[status] || { color: "default", text: status };
 };
 
-export default async function PostPage({ params }: { params: { id: string } }) {
+export default async function PostPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   try {
+    const { id } = await params;
     const post = await prisma.post.findUnique({
       where: {
-        id: params.id,
-      },
-      include: {
-        tags: true,
+        id: id,
       },
     });
 
@@ -51,7 +53,10 @@ export default async function PostPage({ params }: { params: { id: string } }) {
               {title}
             </Title>
             <div className="flex flex-col items-end">
-              <Badge status={statusInfo.color as any} text={statusInfo.text} />
+              <Badge
+                status={statusInfo.color as never}
+                text={statusInfo.text}
+              />
               {post.isApproved && (
                 <Tag color="green" className="mt-1">
                   已审核
@@ -85,8 +90,8 @@ export default async function PostPage({ params }: { params: { id: string } }) {
 
             {post.tags.length > 0 &&
               post.tags.map((tag) => (
-                <Tag key={tag.id} color="blue">
-                  {tag.name}
+                <Tag key={tag} color="blue">
+                  {tag}
                 </Tag>
               ))}
           </Space>

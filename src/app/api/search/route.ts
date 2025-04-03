@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export async function GET(request: Request) {
   try {
@@ -11,13 +12,11 @@ export async function GET(request: Request) {
     if (!query) {
       return NextResponse.json({ error: "搜索词是必需的" }, { status: 400 });
     }
-
     // 构建搜索查询
     const where = {
       OR: [
-        { title: { contains: query, mode: "insensitive" } },
-        { content: { contains: query, mode: "insensitive" } },
-        { tags: { some: { name: { contains: query, mode: "insensitive" } } } },
+        { title: { contains: query, mode: Prisma.QueryMode.insensitive } },
+        { content: { contains: query, mode: Prisma.QueryMode.insensitive } },
       ],
     };
 
@@ -28,9 +27,6 @@ export async function GET(request: Request) {
         take: pageSize,
         skip: (page - 1) * pageSize,
         orderBy: [{ published: "desc" }, { createdAt: "desc" }],
-        include: {
-          tags: true,
-        },
       }),
       prisma.post.count({ where }),
     ]);

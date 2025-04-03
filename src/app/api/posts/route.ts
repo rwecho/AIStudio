@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { PostStatus } from "@prisma/client";
+import { uploadToAliyun, deleteFromAliyun } from "@/lib/aliyun";
+import { v5 } from "uuid";
 
 // 辅助函数：不区分大小写获取URL参数
 function getParamCaseInsensitive(
@@ -108,27 +110,51 @@ export async function GET(request: Request) {
 // 创建新文章
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const formData = await request.formData();
+    const title = formData.get("title") as string;
+    const content = formData.get("content") as string;
+    const link = formData.get("link") as string;
 
     // 确保必填字段存在
-    if (!body.title) {
-      return NextResponse.json({ error: "标题不能为空" }, { status: 400 });
+    if (!title && !content) {
+      return NextResponse.json(
+        { error: "标题或内容不能为空" },
+        { status: 400 }
+      );
     }
 
-    debugger;
+    // 处理媒体文件
+    const mediaFiles = (formData.getAll("files") || []) as File[];
+
+    const ossKeys = [];
+
+    // 上传 媒体文件到阿里云
+    for (const mediaFile of mediaFiles) {
+      const file = mediaFile as File;
+      const fileBuffer = Buffer.from(await file.arrayBuffer());
+      // 上传到阿里云
+      const fullUuid = v5(link, v5.URL);
+      const uuid = fullUuid.substring(0, 8);
+      const filePath = `${uuid}/${file.name}`;
+      const ossKey = await uploadToAliyun(fileBuffer, filePath);
+      ossKeys.push(ossKey);
+    }
+
     // 创建新文章
     const post = await prisma.post.create({
       data: {
-        title: body.title,
-        link: body.link || "",
-        content: body.description || "",
-        source: body.source || "",
-        author: body.author || "",
-        published: body.published ? new Date(body.published) : new Date(),
-        status: body.status
-          ? (body.status.toUpperCase() as PostStatus)
-          : PostStatus.DRAFT,
-        // 如果有其他字段，可以在这里添加
+        title: title,
+        link: (formData.get("link") as string) || "",
+        content: content,
+        source: (formData.get("source") as string) || "",
+        author: (formData.get("author") as string) || "",
+        published: formData.get("published")
+          ? new Date(formData.get("published") as string)
+          : null,
+        status: PostStatus.DRAFT,
+        hasCoverImage: !!formData.get("coverImage"),
+        coverImage: (formData.get("coverImage") as string) || null,
+        mediaFiles: ossKeys,
       },
     });
 
@@ -139,52 +165,80 @@ export async function POST(request: Request) {
   }
 }
 
-// 更新文章
 export async function PUT(request: Request) {
   try {
-    const body = await request.json();
+    const formData = await request.formData();
+    const id = formData.get("id") as string;
 
     // 确保提供了ID
-    if (!body.id) {
+    if (!id) {
       return NextResponse.json({ error: "必须提供文章ID" }, { status: 400 });
     }
 
     // 检查文章是否存在
     const existingPost = await prisma.post.findUnique({
-      where: { id: body.id },
+      where: { id },
     });
 
     if (!existingPost) {
       return NextResponse.json({ error: "文章不存在" }, { status: 404 });
     }
 
+    // 处理新的媒体文件
+    const mediaFiles = (formData.getAll("files") || []) as File[];
+    let ossKeys = [...(existingPost.mediaFiles || [])]; // 保留现有的文件
+    const shouldReplaceFiles = formData.get("replaceFiles") === "true";
+
+    // 如果设置了替换文件标志，则清空现有文件列表
+    if (shouldReplaceFiles) {
+      // 可以选择删除云端文件，这里暂不实现
+      ossKeys = [];
+    }
+
+    // 上传新的媒体文件到阿里云
+    for (const mediaFile of mediaFiles) {
+      const file = mediaFile as File;
+      const fileBuffer = Buffer.from(await file.arrayBuffer());
+      // 上传到阿里云
+      const fullUuid = v5(existingPost.link || id, v5.URL);
+      const uuid = fullUuid.substring(0, 8);
+      const filePath = `${uuid}/${file.name}`;
+      const ossKey = await uploadToAliyun(fileBuffer, filePath);
+      ossKeys.push(ossKey);
+    }
+
     // 更新文章
     const updatedPost = await prisma.post.update({
-      where: { id: body.id },
+      where: { id },
       data: {
-        title: body.title !== undefined ? body.title : existingPost.title,
-        content:
-          body.content !== undefined ? body.content : existingPost.content,
-        source: body.source !== undefined ? body.source : existingPost.source,
-        author: body.author !== undefined ? body.author : existingPost.author,
+        title: (formData.get("title") as string) || existingPost.title,
+        content: (formData.get("content") as string) || existingPost.content,
+        source: (formData.get("source") as string) || existingPost.source,
+        author: (formData.get("author") as string) || existingPost.author,
         formattedTitle:
-          body.formattedTitle !== undefined
-            ? body.formattedTitle
-            : existingPost.formattedTitle,
+          (formData.get("formattedTitle") as string) ||
+          existingPost.formattedTitle,
         formattedContent:
-          body.formattedContent !== undefined
-            ? body.formattedContent
-            : existingPost.formattedContent,
-        keywords: body.keywords ? body.keywords : existingPost.keywords,
-        sourceUrls: body.sourceUrls ? body.sourceUrls : existingPost.sourceUrls,
-        coverImage: body.coverImage,
-        published: body.published
-          ? new Date(body.published)
+          (formData.get("formattedContent") as string) ||
+          existingPost.formattedContent,
+        keywords: formData.get("keywords")
+          ? JSON.parse(formData.get("keywords") as string)
+          : existingPost.keywords,
+        sourceUrls: formData.get("sourceUrls")
+          ? JSON.parse(formData.get("sourceUrls") as string)
+          : existingPost.sourceUrls,
+        coverImage:
+          (formData.get("coverImage") as string) || existingPost.coverImage,
+        hasCoverImage: formData.has("coverImage")
+          ? !!formData.get("coverImage")
+          : existingPost.hasCoverImage,
+        published: formData.get("published")
+          ? new Date(formData.get("published") as string)
           : existingPost.published,
-        status: body.status
-          ? (body.status.toUpperCase() as PostStatus)
+        status: formData.get("status")
+          ? ((formData.get("status") as string).toUpperCase() as PostStatus)
           : existingPost.status,
-        // 如果有其他字段，可以在这里添加
+        mediaFiles: ossKeys, // 始终更新媒体文件列表
       },
     });
 
@@ -205,7 +259,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "必须提供文章ID" }, { status: 400 });
     }
 
-    // 检查文章是否存在
+    // 检查文章是否存在，并获取关联的媒体文件
     const existingPost = await prisma.post.findUnique({
       where: { id },
     });
@@ -214,7 +268,17 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "文章不存在" }, { status: 404 });
     }
 
-    // 删除文章
+    // 从阿里云删除相关媒体文件
+    for (const mediaFile of existingPost.mediaFiles) {
+      try {
+        await deleteFromAliyun(mediaFile);
+      } catch (err) {
+        console.error(`删除文件 ${mediaFile} 失败:`, err);
+        // 继续处理其他文件，不中断流程
+      }
+    }
+
+    // 删除文章 (Prisma 级联删除会自动删除关联的 mediaFiles 记录)
     await prisma.post.delete({
       where: { id },
     });

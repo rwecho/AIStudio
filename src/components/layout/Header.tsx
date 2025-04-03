@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { mainNavItems } from "@/constants/navigation";
 import { useIsMobile } from "@/hooks/useMedia";

@@ -1,7 +1,7 @@
 "use client";
 import { parseHtml } from "@/utils/html";
 import { Post } from "@prisma/client";
-import { Button, Card, Image, Tooltip, Tag } from "antd";
+import { Card, Image, Tooltip } from "antd";
 import { timeAgo } from "@/utils/formatDate";
 import Title from "antd/es/typography/Title";
 import Link from "next/link";

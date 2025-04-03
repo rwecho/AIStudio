@@ -42,7 +42,7 @@ export default function PostsPage() {
     }
 
     return () => observer.disconnect();
-  }, [page]);
+  }, [loadMore, page]);
 
   return (
     <div className="content">

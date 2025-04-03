@@ -51,7 +51,7 @@ const PostRow = ({ post }: { post: Post }) => {
             </Space>
           </Space>
           <div className={styles.tags}>
-            {post.cate?.map((tag, index) => (
+            {post.tags.map((tag, index) => (
               <Tag key={index} color="blue">
                 {tag}
               </Tag>

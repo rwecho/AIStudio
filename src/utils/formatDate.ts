@@ -1,23 +1,3 @@
-export function formatDate(
-  date: string | Date,
-  format: string = "YYYY-MM-DD HH:mm:ss"
-) {
-  const d = new Date(date);
-
-  const replacements = {
-    YYYY: d.getFullYear(),
-    MM: String(d.getMonth() + 1).padStart(2, "0"),
-    DD: String(d.getDate()).padStart(2, "0"),
-    HH: String(d.getHours()).padStart(2, "0"),
-    mm: String(d.getMinutes()).padStart(2, "0"),
-    ss: String(d.getSeconds()).padStart(2, "0"),
-  };
-
-  return format.replace(/YYYY|MM|DD|HH|mm|ss/g, (match) =>
-    String(replacements[match])
-  );
-}
-
 export function timeAgo(date: string | Date): string {
   const seconds = Math.floor(
     (new Date().getTime() - new Date(date).getTime()) / 1000

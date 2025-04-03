@@ -5,6 +5,7 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import "./globals.css";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,9 @@ export default function RootLayout({
         <AntdRegistry>
           <div className="app-container">
             <Header />
-            <main>{children}</main>
+            <Suspense>
+              <main>{children}</main>
+            </Suspense>
             <Footer />
           </div>
         </AntdRegistry>
