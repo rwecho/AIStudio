@@ -9,8 +9,6 @@
     "start": "next start",
     "lint": "next lint",
     "db:seed": "ts-node prisma/seed.ts",
-    "prisma:generate": "prisma generate",
-    "prisma:generate:telegram": "prisma generate --schema=prisma_telegram/schema.prisma",
     "postinstall": "prisma generate"
   },
   "dependencies": {
