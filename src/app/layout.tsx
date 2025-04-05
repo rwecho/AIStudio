@@ -4,7 +4,6 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { Suspense } from "react";
 
 import "./globals.css";
-import HydrationLoading from "@/components/layout/Loading";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +30,6 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <AntdRegistry>
           <div className="app-container">
-            <HydrationLoading></HydrationLoading>
             <Suspense>
               <main>{children}</main>
             </Suspense>
