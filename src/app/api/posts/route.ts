@@ -38,6 +38,7 @@ export async function GET(request: Request) {
   const endTime = getParamCaseInsensitive(searchParams, "endTime");
   const search = getParamCaseInsensitive(searchParams, "search");
   const status = getParamCaseInsensitive(searchParams, "status");
+  const source = getParamCaseInsensitive(searchParams, "source");
 
   // 构建查询条件
   const where = {} as {
@@ -52,6 +53,7 @@ export async function GET(request: Request) {
       author?: { contains: string; mode: "insensitive" };
     }>;
     status?: PostStatus;
+    source?: string;
   };
 
   // 添加时间范围筛选
@@ -74,6 +76,11 @@ export async function GET(request: Request) {
       { source: { contains: search, mode: "insensitive" } },
       { author: { contains: search, mode: "insensitive" } },
     ];
+  }
+  console.log("source", source);
+
+  if (source) {
+    where.source = source;
   }
 
   // 添加状态筛选

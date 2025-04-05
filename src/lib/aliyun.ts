@@ -29,7 +29,6 @@ export async function uploadToAliyun(
 // 获取文件url
 export async function getAliyunFileUrl(filePath: string): Promise<string> {
   try {
-    debugger;
     const client = createOSSClient();
     const url = client.signatureUrl(filePath, {
       expires: 60 * 60, // 1小时有效期

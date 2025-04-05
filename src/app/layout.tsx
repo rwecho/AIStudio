@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import "./globals.css";
 import { Suspense } from "react";
+
+import "./globals.css";
+import HydrationLoading from "@/components/layout/Loading";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,11 +31,10 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <AntdRegistry>
           <div className="app-container">
-            <Header />
+            <HydrationLoading></HydrationLoading>
             <Suspense>
               <main>{children}</main>
             </Suspense>
-            <Footer />
           </div>
         </AntdRegistry>
       </body>
