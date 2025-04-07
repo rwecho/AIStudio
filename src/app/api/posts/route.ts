@@ -107,6 +107,12 @@ export async function GET(request: Request) {
 
   const total = await prisma.post.count({ where });
 
+  for (const post of posts) {
+    if (post.formattedContent) {
+      post.content = post.formattedContent;
+    }
+  }
+
   return NextResponse.json({
     posts,
     total,
@@ -174,8 +180,8 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const formData = await request.formData();
-    const id = formData.get("id") as string;
+    const input = await request.json();
+    const id = input.id as string;
 
     // 确保提供了ID
     if (!id) {
@@ -191,61 +197,34 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "文章不存在" }, { status: 404 });
     }
 
-    // 处理新的媒体文件
-    const mediaFiles = (formData.getAll("files") || []) as File[];
-    let ossKeys = [...(existingPost.mediaFiles || [])]; // 保留现有的文件
-    const shouldReplaceFiles = formData.get("replaceFiles") === "true";
-
-    // 如果设置了替换文件标志，则清空现有文件列表
-    if (shouldReplaceFiles) {
-      // 可以选择删除云端文件，这里暂不实现
-      ossKeys = [];
-    }
-
-    // 上传新的媒体文件到阿里云
-    for (const mediaFile of mediaFiles) {
-      const file = mediaFile as File;
-      const fileBuffer = Buffer.from(await file.arrayBuffer());
-      // 上传到阿里云
-      const fullUuid = v5(existingPost.link || id, v5.URL);
-      const uuid = fullUuid.substring(0, 8);
-      const filePath = `${uuid}/${file.name}`;
-      const ossKey = await uploadToAliyun(fileBuffer, filePath);
-      ossKeys.push(ossKey);
-    }
-
     // 更新文章
     const updatedPost = await prisma.post.update({
       where: { id },
       data: {
-        title: (formData.get("title") as string) || existingPost.title,
-        content: (formData.get("content") as string) || existingPost.content,
-        source: (formData.get("source") as string) || existingPost.source,
-        author: (formData.get("author") as string) || existingPost.author,
+        title: (input.title as string) || existingPost.title,
+        content: (input.content as string) || existingPost.content,
+        source: (input.source as string) || existingPost.source,
+        author: (input.author as string) || existingPost.author,
         formattedTitle:
-          (formData.get("formattedTitle") as string) ||
-          existingPost.formattedTitle,
+          (input.formattedTitle as string) || existingPost.formattedTitle,
         formattedContent:
-          (formData.get("formattedContent") as string) ||
-          existingPost.formattedContent,
-        keywords: formData.get("keywords")
-          ? JSON.parse(formData.get("keywords") as string)
+          (input.formattedContent as string) || existingPost.formattedContent,
+        keywords: input.keywords
+          ? JSON.parse(input.keywords as string)
           : existingPost.keywords,
-        sourceUrls: formData.get("sourceUrls")
-          ? JSON.parse(formData.get("sourceUrls") as string)
+        sourceUrls: input.sourceUrls
+          ? JSON.parse(input.sourceUrls as string)
           : existingPost.sourceUrls,
-        coverImage:
-          (formData.get("coverImage") as string) || existingPost.coverImage,
-        hasCoverImage: formData.has("coverImage")
-          ? !!formData.get("coverImage")
+        coverImage: (input.coverImage as string) || existingPost.coverImage,
+        hasCoverImage: input.coverImage
+          ? !!input.coverImage
           : existingPost.hasCoverImage,
-        published: formData.get("published")
-          ? new Date(formData.get("published") as string)
+        published: input.published
+          ? new Date(input.published as string)
           : existingPost.published,
-        status: formData.get("status")
-          ? ((formData.get("status") as string).toUpperCase() as PostStatus)
+        status: input.status
+          ? ((input.status as string).toUpperCase() as PostStatus)
           : existingPost.status,
-        mediaFiles: ossKeys, // 始终更新媒体文件列表
       },
     });
 

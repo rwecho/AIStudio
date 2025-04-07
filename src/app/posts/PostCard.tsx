@@ -18,6 +18,27 @@ const preprocessMarkdown = (content: string) => {
   return content.replace(/\*\*(.*?)\s+\*\*/g, "**$1**");
 };
 
+const formatAssets = (html: string) => {
+  // 找到 html 里面的图片、视频和音乐，在url前面增加代理地址
+  const regex =
+    /<img[^>]+src="([^">]+)"|<video[^>]+src="([^">]+)"|<audio[^>]+src="([^">]+)"/g;
+  const proxyUrl = process.env.NEXT_PUBLIC_EDGE_PROXY_URL;
+
+  html = html.replace(regex, (match, imgSrc, videoSrc, audioSrc) => {
+    const src = imgSrc || videoSrc || audioSrc;
+    if (!src.startsWith("http")) {
+      const url = process.env.NEXT_PUBLIC_URL;
+      if (!url) {
+        throw new Error("NEXT_PUBLIC_URL is not defined");
+      }
+      return match.replace(src, `${proxyUrl}/${url}${src}`);
+    }
+    return match.replace(src, `${proxyUrl}/${src}`);
+  });
+
+  return html;
+};
+
 const PostCard = ({ post }: { post: Post }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const cover = post.mediaFiles.length > 0 ? post.mediaFiles[0] : "";
@@ -57,7 +78,7 @@ const PostCard = ({ post }: { post: Post }) => {
       element.parentNode?.removeChild(element);
     });
 
-    const formattedHtml = card.innerHTML;
+    const formattedHtml = formatAssets(card.innerHTML);
 
     console.log("复制的内容: ", formattedHtml);
 
