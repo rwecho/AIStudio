@@ -21,10 +21,12 @@ export default async function Home({
     const response = await fetch(`${decodedUrl}`);
     const html = await response.text();
 
+    const referrer = response.url;
+
     // 使用JSDOM解析HTML
     const doc = new JSDOM(html, {
-      url: `https://${targetUrl}`,
-      referrer: "https://www.aistudiox.design/",
+      url: targetUrl,
+      referrer: referrer,
       contentType: "text/html",
       includeNodeLocations: true,
       storageQuota: 10000000,

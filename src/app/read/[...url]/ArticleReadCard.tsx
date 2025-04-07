@@ -10,27 +10,9 @@ import {
 const { Title, Paragraph, Text } = Typography;
 const { Content } = Layout;
 
+import styles from "./ArticleReadCard.module.css";
 // 添加客户端样式
 import "antd/dist/reset.css";
-
-// 自定义CSS用于增强阅读体验
-const styles = {
-  readContainer: {
-    maxWidth: "800px",
-    margin: "0 auto",
-    padding: "24px",
-  },
-  articleContent: {
-    fontSize: "16px",
-    lineHeight: "1.8",
-  },
-  metadata: {
-    marginTop: "24px",
-    padding: "16px",
-    background: "#f5f5f5",
-    borderRadius: "4px",
-  },
-};
 
 const ArticleReadCard = ({
   article,
@@ -48,7 +30,7 @@ const ArticleReadCard = ({
   return (
     <>
       <Layout>
-        <Content style={styles.readContainer}>
+        <Content className={styles.readContainer}>
           <Card variant="borderless" style={{ marginBottom: "24px" }}>
             <Typography>
               <Title level={1}>{article?.title || "无标题"}</Title>
@@ -84,8 +66,7 @@ const ArticleReadCard = ({
 
               {article?.content ? (
                 <div
-                  className="article-content"
-                  style={styles.articleContent}
+                  className={styles.articleContent}
                   dangerouslySetInnerHTML={{ __html: article.content }}
                 />
               ) : (
@@ -97,7 +78,7 @@ const ArticleReadCard = ({
             title="文章信息"
             size="small"
             variant="borderless"
-            style={styles.metadata}
+            className={styles.metadata}
           >
             <Row gutter={[16, 16]}>
               {article?.siteName && (
