@@ -23,7 +23,7 @@ function setCorsHeaders(response: NextResponse, headerList: ReadonlyHeaders) {
   // 添加内容安全策略头部
   response.headers.set(
     "Content-Security-Policy",
-    "default-src 'self'; img-src 'self' data: blob: *; connect-src 'self' *;"
+    "default-src 'self'; img-src 'self' data: blob: *; connect-src 'self' *; unsafe-inline;"
   );
 
   if (origin !== "*") {
