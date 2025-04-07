@@ -5,9 +5,10 @@ import { NextResponse } from "next/server";
 // 设置CORS头部的辅助函数
 function setCorsHeaders(response: NextResponse, headerList: ReadonlyHeaders) {
   const origin = headerList.get("origin") || headerList.get("referer") || "*";
-  console.log("origin", origin);
+  const modifiedOrigin = origin.endsWith("/") ? origin.slice(0, -1) : origin;
+  console.log("origin", modifiedOrigin);
 
-  response.headers.set("Access-Control-Allow-Origin", origin);
+  response.headers.set("Access-Control-Allow-Origin", modifiedOrigin);
   response.headers.set(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS"
