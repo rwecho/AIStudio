@@ -27,9 +27,9 @@ const formatAssets = (html: string) => {
   html = html.replace(regex, (match, imgSrc, videoSrc, audioSrc) => {
     const src = imgSrc || videoSrc || audioSrc;
     if (!src.startsWith("http")) {
-      const url = process.env.NEXT_PUBLIC_URL;
+      const url = process.env.NEXT_PUBLIC_API_URL;
       if (!url) {
-        throw new Error("NEXT_PUBLIC_URL is not defined");
+        throw new Error("NEXT_PUBLIC_API_URL is not defined");
       }
       return match.replace(src, `${proxyUrl}/${url}${src}`);
     }
