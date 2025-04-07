@@ -31,9 +31,10 @@ const formatAssets = (html: string) => {
       if (!url) {
         throw new Error("NEXT_PUBLIC_API_URL is not defined");
       }
-      return match.replace(src, `${proxyUrl}/${url}${src}`);
+      const assetUrl = encodeURIComponent(url + src);
+      return match.replace(src, `${proxyUrl}/${assetUrl}`);
     }
-    return match.replace(src, `${proxyUrl}/${src}`);
+    return match.replace(src, `${proxyUrl}/${encodeURIComponent(src)}`);
   });
 
   return html;
