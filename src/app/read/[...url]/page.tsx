@@ -1,9 +1,8 @@
-import { Readability } from "@mozilla/readability";
 import React from "react";
-import { JSDOM } from "jsdom";
 import ArticleReadCard from "./ArticleReadCard";
 import NoContentCard from "./NoContentCard";
 import ErrorPageCard from "./ErrorPageCard";
+import axiosInstance from "@/lib/axios";
 
 export default async function Home({
   params,
@@ -16,24 +15,15 @@ export default async function Home({
   const decodedUrl = decodeURIComponent(targetUrl);
 
   try {
-    console.log(decodedUrl);
-    // 获取目标网页内容
-    const response = await fetch(`${decodedUrl}`);
-    const html = await response.text();
-
-    const referrer = response.url;
-
-    // 使用JSDOM解析HTML
-    const doc = new JSDOM(html, {
-      url: targetUrl,
-      referrer: referrer,
-      contentType: "text/html",
-      includeNodeLocations: true,
-      storageQuota: 10000000,
+    const { data: response } = await axiosInstance.post("/api/readablility", {
+      url: decodedUrl,
     });
 
-    const reader = new Readability(doc.window.document);
-    const article = reader.parse();
+    const { data: article, error } = response;
+
+    if (error) {
+      throw new Error(error);
+    }
 
     return article ? <ArticleReadCard article={article} /> : <NoContentCard />;
   } catch (error) {

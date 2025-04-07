@@ -1,0 +1,22 @@
+.readContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.articleContent {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.articleContent img {
+  max-width: 100%;
+  height: auto;
+}
+
+.metadata {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
