@@ -26,7 +26,7 @@ const getFileType = (filename: string): string => {
 // 媒体文件组件
 const MediaFile = ({ file }: { file: string }) => {
   const fileType = getFileType(file);
-  const fileUrl = `/api/oss?ossKey=${file}`;
+  const fileUrl = `/api/oss/redirect?ossKey=${file}`;
 
   switch (fileType) {
     case "image":
