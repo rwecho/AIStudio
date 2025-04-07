@@ -22,7 +22,6 @@ const formatAssets = (html: string) => {
   // 找到 html 里面的图片、视频和音乐，在url前面增加代理地址
   const regex =
     /<img[^>]+src="([^">]+)"|<video[^>]+src="([^">]+)"|<audio[^>]+src="([^">]+)"/g;
-  const proxyUrl = process.env.NEXT_PUBLIC_EDGE_PROXY_URL;
 
   html = html.replace(regex, (match, imgSrc, videoSrc, audioSrc) => {
     const src = imgSrc || videoSrc || audioSrc;
@@ -31,10 +30,9 @@ const formatAssets = (html: string) => {
       if (!url) {
         throw new Error("NEXT_PUBLIC_API_URL is not defined");
       }
-      const assetUrl = encodeURIComponent(url + src);
-      return match.replace(src, `${proxyUrl}/${assetUrl}`);
+      return match.replace(src, src.replace("/redirect", ""));
     }
-    return match.replace(src, `${proxyUrl}/${encodeURIComponent(src)}`);
+    return match.replace(src, src.replace("/redirect", ""));
   });
 
   return html;
