@@ -8,6 +8,7 @@ function setCorsHeaders(response: NextResponse, headerList: ReadonlyHeaders) {
   const modifiedOrigin = origin.endsWith("/") ? origin.slice(0, -1) : origin;
   console.log("origin", modifiedOrigin);
 
+  // 更新CORS头部
   response.headers.set("Access-Control-Allow-Origin", modifiedOrigin);
   response.headers.set(
     "Access-Control-Allow-Methods",
@@ -18,6 +19,12 @@ function setCorsHeaders(response: NextResponse, headerList: ReadonlyHeaders) {
     "Content-Type, Authorization"
   );
   response.headers.set("Access-Control-Allow-Credentials", "true");
+
+  // 添加内容安全策略头部
+  response.headers.set(
+    "Content-Security-Policy",
+    "default-src 'self'; img-src 'self' data: blob: *; connect-src 'self' *;"
+  );
 
   if (origin !== "*") {
     response.headers.set("Vary", "Origin");
