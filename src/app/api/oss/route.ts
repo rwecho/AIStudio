@@ -19,13 +19,6 @@ function setCorsHeaders(response: NextResponse, headerList: ReadonlyHeaders) {
     "Content-Type, Authorization"
   );
   response.headers.set("Access-Control-Allow-Credentials", "true");
-
-  // 添加内容安全策略头部
-  response.headers.set(
-    "Content-Security-Policy",
-    "default-src 'self'; img-src 'self' data: blob: *; connect-src 'self' *; unsafe-inline;"
-  );
-
   if (origin !== "*") {
     response.headers.set("Vary", "Origin");
   }
