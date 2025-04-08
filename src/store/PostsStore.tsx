@@ -1,25 +1,29 @@
-import { Post } from "@prisma/client";
+"use client";
+
 import { create } from "zustand";
+import { Post, WechatPublish } from "@prisma/client";
 import axiosInstance from "@/lib/axios";
 
-type State = {
-  posts: Post[];
+interface PostWithWechatPublish extends Post {
+  wechatPublish?: WechatPublish;
+}
+
+interface PostsStore {
+  posts: PostWithWechatPublish[];
+  page: number;
   filters: {
     source: string | null;
     tags: string[];
   };
-  page: number;
   hasMore: boolean;
   loading: boolean;
-};
-
-type Actions = {
+  setFilters: (filters: PostsStore["filters"]) => void;
   loadMore: () => Promise<void>;
   reload: () => Promise<void>;
-  setFilters: (filters: { source: string | null; tags: string[] }) => void;
-};
+  updatePost: (postId: string, data: Partial<PostWithWechatPublish>) => void;
+}
 
-const usePostsStore = create<State & Actions>((set, get) => ({
+const usePostsStore = create<PostsStore>((set, get) => ({
   posts: [],
   page: 1,
   filters: {
@@ -32,9 +36,7 @@ const usePostsStore = create<State & Actions>((set, get) => ({
     set({ filters });
   },
   loadMore: async () => {
-    const { page } = get();
-
-    let url = `/api/posts?page=${page}&pageSize=10`;
+    let url = `/api/posts?page=${get().page}&pageSize=10`;
     if (get().filters.source) {
       url += `&source=${get().filters.source}`;
     }
@@ -63,6 +65,24 @@ const usePostsStore = create<State & Actions>((set, get) => ({
   reload: async () => {
     set({ posts: [], page: 1, hasMore: true });
     await get().loadMore();
+  },
+  updatePost: (postId, data) => {
+    const { posts } = get();
+    const postIndex = posts.findIndex((post) => post.id === postId);
+    if (postIndex === -1) return;
+
+    const updatedPost = {
+      ...posts[postIndex],
+      ...data,
+    };
+
+    set((state) => ({
+      posts: [
+        ...state.posts.slice(0, postIndex),
+        updatedPost,
+        ...state.posts.slice(postIndex + 1),
+      ],
+    }));
   },
 }));
 

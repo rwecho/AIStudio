@@ -1,7 +1,8 @@
 "use client";
-import { Post } from "@prisma/client";
+import { Post, WechatPublish } from "@prisma/client";
 import React from "react";
-import { Card, Space, Typography, message } from "antd";
+import { Card, Popconfirm, Space, Typography, message } from "antd";
+import { CopyOutlined, WechatOutlined } from "@ant-design/icons";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
@@ -10,8 +11,8 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { timeAgo } from "@/utils/formatDate";
 import MediaFile from "./MediaFile";
-import { CopyOutlined } from "@ant-design/icons";
 import "./markdown-styles.css"; // 引入样式文件
+import usePostsStore from "@/store/PostsStore";
 
 const { Text } = Typography;
 const preprocessMarkdown = (content: string) => {
@@ -38,50 +39,41 @@ const formatAssets = (html: string) => {
   return html;
 };
 
-const PostCard = ({ post }: { post: Post }) => {
-  const [messageApi, contextHolder] = message.useMessage();
-  const cover = post.mediaFiles.length > 0 ? post.mediaFiles[0] : "";
+const getCardInnerHtml = (cardId: string) => {
+  const card = document.getElementById(cardId);
+  if (!card) return [null, null];
 
-  const restMediaFiles = post.mediaFiles.slice(1);
+  // 创建一个新的blob，包含完整的HTML和内联样式
+  const styles = Array.from(document.styleSheets)
+    .filter((styleSheet) => {
+      try {
+        return (
+          !styleSheet.href || styleSheet.href.startsWith(window.location.origin)
+        );
+      } catch {
+        return false;
+      }
+    })
+    .map((styleSheet) => {
+      try {
+        return Array.from(styleSheet.cssRules)
+          .map((rule) => rule.cssText)
+          .join("\n");
+      } catch {
+        return "";
+      }
+    })
+    .join("\n");
 
-  const handleCopy = (cardId: string) => {
-    const card = document.getElementById(cardId);
-    if (!card) return;
+  // 从innerHtml 移除 .ant-image-mask 元素
+  const maskElements = card.querySelectorAll(".ant-image-mask");
+  maskElements.forEach((element) => {
+    element.parentNode?.removeChild(element);
+  });
 
-    // 创建一个新的blob，包含完整的HTML和内联样式
-    const styles = Array.from(document.styleSheets)
-      .filter((styleSheet) => {
-        try {
-          return (
-            !styleSheet.href ||
-            styleSheet.href.startsWith(window.location.origin)
-          );
-        } catch {
-          return false;
-        }
-      })
-      .map((styleSheet) => {
-        try {
-          return Array.from(styleSheet.cssRules)
-            .map((rule) => rule.cssText)
-            .join("\n");
-        } catch {
-          return "";
-        }
-      })
-      .join("\n");
+  const formattedHtml = formatAssets(card.innerHTML);
 
-    // 从innerHtml 移除 .ant-image-mask 元素
-    const maskElements = card.querySelectorAll(".ant-image-mask");
-    maskElements.forEach((element) => {
-      element.parentNode?.removeChild(element);
-    });
-
-    const formattedHtml = formatAssets(card.innerHTML);
-
-    console.log("复制的内容: ", formattedHtml);
-
-    const content = `
+  const content = `
       <html>
         <head>
           <style>${styles}</style>
@@ -92,10 +84,30 @@ const PostCard = ({ post }: { post: Post }) => {
       </html>
     `;
 
+  return [content, card.innerText];
+};
+
+const PostCard = ({
+  post,
+}: {
+  post: Post & { wechatPublish?: WechatPublish };
+}) => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const cover = post.mediaFiles.length > 0 ? post.mediaFiles[0] : "";
+
+  const { updatePost } = usePostsStore();
+
+  const restMediaFiles = post.mediaFiles.slice(1);
+
+  const handleCopy = (cardId: string) => {
+    const [content, innerText] = getCardInnerHtml(cardId);
+    if (!content || !innerText) {
+      return;
+    }
     // 使用 Clipboard API 复制富文本
     const clipboardItem = new ClipboardItem({
       "text/html": new Blob([content], { type: "text/html" }),
-      "text/plain": new Blob([card.innerText], { type: "text/plain" }),
+      "text/plain": new Blob([innerText], { type: "text/plain" }),
     });
 
     navigator.clipboard
@@ -104,9 +116,44 @@ const PostCard = ({ post }: { post: Post }) => {
       .catch((err) => {
         console.error("复制失败: ", err);
         // 回退到普通文本复制
-        navigator.clipboard.writeText(card.innerText);
+        navigator.clipboard.writeText(innerText);
         messageApi.success("复制成功（纯文本）");
       });
+  };
+
+  const handlePublishToWechat = async (cardId: string) => {
+    try {
+      const [content, innerText] = getCardInnerHtml(cardId);
+      if (!content || !innerText) {
+        return;
+      }
+      const response = await fetch(`/api/posts/wechat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: post.id,
+          content,
+          title: post.title,
+          cover: post.mediaFiles.length > 0 ? post.mediaFiles[0] : "",
+          source: post.source,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "发布失败");
+      }
+
+      messageApi.success("已发布到公众号");
+      updatePost(post.id, {
+        wechatPublish: result,
+      });
+    } catch (error) {
+      messageApi.error("发布失败：" + (error as Error).message);
+    }
   };
 
   return (
@@ -116,10 +163,31 @@ const PostCard = ({ post }: { post: Post }) => {
         style={{ margin: "16px 0" }}
         actions={[
           <CopyOutlined
-            key="setting"
+            key="copy"
             onClick={() => handleCopy("post-card-" + post.id)}
           />,
-        ]}
+
+          post.wechatPublish?.status === "FAILED" ? (
+            <Text type="danger">发布到公众号失败</Text>
+          ) : null,
+          post.wechatPublish?.status === "PUBLISHED" ? (
+            <Text type="success">已发布到公众号</Text>
+          ) : null,
+          post.wechatPublish?.status === "PENDING" ? (
+            <Text type="warning">正在发布到公众号</Text>
+          ) : null,
+          !post.wechatPublish?.status ? (
+            <Popconfirm
+              key="wechat"
+              title="确认发布到公众号吗？"
+              onConfirm={() => handlePublishToWechat("post-card-" + post.id)}
+              okText="确认"
+              cancelText="取消"
+            >
+              <WechatOutlined title="发布到公众号" />
+            </Popconfirm>
+          ) : null,
+        ].filter(Boolean)}
       >
         <div className="markdown-content" id={"post-card-" + post.id}>
           <Space

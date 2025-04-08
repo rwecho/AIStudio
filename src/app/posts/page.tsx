@@ -28,6 +28,7 @@ export default function PostsPage() {
 
     return () => observer.disconnect();
   }, [hasMore, loadMore, page]);
+
   return (
     <>
       {isMobile && (

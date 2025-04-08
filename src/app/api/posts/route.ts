@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { PostStatus } from "@prisma/client";
+import { PostStatus, WechatPublishStatus } from "@prisma/client";
 import { uploadToAliyun, deleteFromAliyun } from "@/lib/aliyun";
 import { v5 } from "uuid";
 
@@ -39,6 +39,7 @@ export async function GET(request: Request) {
   const search = getParamCaseInsensitive(searchParams, "search");
   const status = getParamCaseInsensitive(searchParams, "status");
   const source = getParamCaseInsensitive(searchParams, "source");
+  const wechatStatus = getParamCaseInsensitive(searchParams, "wechatStatus");
 
   // 构建查询条件
   const where = {} as {
@@ -54,6 +55,13 @@ export async function GET(request: Request) {
     }>;
     status?: PostStatus;
     source?: string;
+    wechatPublish?:
+      | {
+          status?: WechatPublishStatus;
+        }
+      | {
+          is?: null;
+        };
   };
 
   // 添加时间范围筛选
@@ -96,8 +104,30 @@ export async function GET(request: Request) {
     }
   }
 
+  // 添加微信发布状态筛选
+  if (wechatStatus) {
+    const wechatStatusUpper = wechatStatus.toUpperCase();
+    if (wechatStatusUpper === "NULL") {
+      // 查询未发布到微信的文章
+      where.wechatPublish = {
+        is: null,
+      };
+    } else if (
+      Object.values(WechatPublishStatus).includes(
+        wechatStatusUpper as WechatPublishStatus
+      )
+    ) {
+      where.wechatPublish = {
+        status: wechatStatusUpper as WechatPublishStatus,
+      };
+    }
+  }
+
   const posts = await prisma.post.findMany({
     where,
+    include: {
+      wechatPublish: true, // 包含微信发布状态
+    },
     take: pageSize,
     skip: (page - 1) * pageSize,
     orderBy: {
@@ -169,6 +199,9 @@ export async function POST(request: Request) {
         coverImage: (formData.get("coverImage") as string) || null,
         mediaFiles: ossKeys,
       },
+      include: {
+        wechatPublish: true,
+      },
     });
 
     return NextResponse.json(post, { status: 201 });
@@ -191,10 +224,74 @@ export async function PUT(request: Request) {
     // 检查文章是否存在
     const existingPost = await prisma.post.findUnique({
       where: { id },
+      include: {
+        wechatPublish: true,
+      },
     });
 
     if (!existingPost) {
       return NextResponse.json({ error: "文章不存在" }, { status: 404 });
+    }
+
+    // 处理微信发布状态更新
+    let wechatPublishUpdate;
+    if (input.wechatPublish) {
+      const wechatPublishInput = input.wechatPublish as {
+        status?: WechatPublishStatus;
+        content?: string;
+        error?: string | null;
+        mediaId?: string;
+        publishId?: string;
+      };
+
+      // 如果状态被设置为 PUBLISHED，确保必要字段存在
+      if (wechatPublishInput.status === WechatPublishStatus.PUBLISHED) {
+        if (!wechatPublishInput.mediaId || !wechatPublishInput.publishId) {
+          return NextResponse.json(
+            { error: "发布状态为PUBLISHED时必须提供mediaId和publishId" },
+            { status: 400 }
+          );
+        }
+      }
+
+      // 如果状态被设置为 FAILED，确保提供了错误信息
+      if (
+        wechatPublishInput.status === WechatPublishStatus.FAILED &&
+        !wechatPublishInput.error
+      ) {
+        return NextResponse.json(
+          { error: "发布状态为FAILED时必须提供错误信息" },
+          { status: 400 }
+        );
+      }
+
+      wechatPublishUpdate = {
+        upsert: {
+          create: {
+            status: wechatPublishInput.status || WechatPublishStatus.PENDING,
+            content: wechatPublishInput.content || existingPost.content,
+            error: wechatPublishInput.error,
+            mediaId: wechatPublishInput.mediaId,
+            publishId: wechatPublishInput.publishId,
+          },
+          update: {
+            status: wechatPublishInput.status,
+            ...(wechatPublishInput.content && {
+              content: wechatPublishInput.content,
+            }),
+            ...(wechatPublishInput.error !== undefined && {
+              error: wechatPublishInput.error,
+            }),
+            ...(wechatPublishInput.mediaId && {
+              mediaId: wechatPublishInput.mediaId,
+            }),
+            ...(wechatPublishInput.publishId && {
+              publishId: wechatPublishInput.publishId,
+            }),
+            updatedAt: new Date(),
+          },
+        },
+      };
     }
 
     // 更新文章
@@ -225,6 +322,10 @@ export async function PUT(request: Request) {
         status: input.status
           ? ((input.status as string).toUpperCase() as PostStatus)
           : existingPost.status,
+        wechatPublish: wechatPublishUpdate,
+      },
+      include: {
+        wechatPublish: true,
       },
     });
 
