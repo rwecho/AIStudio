@@ -31,11 +31,17 @@ export const formatPost = (post: Post) => {
   if (post.source === "Meet ChatGPT!") {
     // 删除 Subscribe
     post.content = post.content.split(/\[Subscribe/g)[0];
+
+    // 删除 订阅
+    post.content = post.content.split(/\[订阅/g)[0];
   }
 
   if (post.source?.includes("Digital Dreams")) {
     // 删除 Subscribe
     post.content = post.content.split(/\[Subscribe/g)[0];
+
+    // 删除 订阅
+    post.content = post.content.split(/\[订阅/g)[0];
   }
   return post;
 };
