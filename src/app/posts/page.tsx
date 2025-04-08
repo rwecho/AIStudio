@@ -6,6 +6,7 @@ import PostCard from "./PostCard";
 import FilterCard from "./FilterCard";
 import usePostsStore from "@/store/PostsStore";
 import { useIsMobile } from "@/hooks/useMedia";
+import { formatPost } from "@/lib/posts";
 
 export default function PostsPage() {
   const loadingRef = useRef(null);
@@ -40,7 +41,7 @@ export default function PostsPage() {
           <Row gutter={[16, 8]}>
             {posts.map((post, index) => (
               <Col key={`post-${index}`} span={24}>
-                <PostCard post={post}></PostCard>
+                <PostCard post={formatPost(post)}></PostCard>
               </Col>
             ))}
           </Row>
