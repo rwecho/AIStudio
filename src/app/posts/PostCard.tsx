@@ -194,6 +194,7 @@ const PostCard = ({
             style={{
               marginBottom: "16px",
             }}
+            direction="vertical"
           >
             {cover && <MediaFile file={cover} />}
             {restMediaFiles.length > 0 && (

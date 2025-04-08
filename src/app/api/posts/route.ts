@@ -39,6 +39,7 @@ export async function GET(request: Request) {
   const search = getParamCaseInsensitive(searchParams, "search");
   const status = getParamCaseInsensitive(searchParams, "status");
   const source = getParamCaseInsensitive(searchParams, "source");
+  const sources = getParamCaseInsensitive(searchParams, "sources");
   const wechatStatus = getParamCaseInsensitive(searchParams, "wechatStatus");
 
   // 构建查询条件
@@ -54,7 +55,11 @@ export async function GET(request: Request) {
       author?: { contains: string; mode: "insensitive" };
     }>;
     status?: PostStatus;
-    source?: string;
+    source?:
+      | string
+      | {
+          in: string[];
+        };
     wechatPublish?:
       | {
           status?: WechatPublishStatus;
@@ -91,8 +96,14 @@ export async function GET(request: Request) {
     where.source = source;
   }
 
-  // 添加状态筛选
+  if (sources) {
+    const sourcesArray = sources.split(",");
+    where.source = {
+      in: sourcesArray,
+    };
+  }
   if (status) {
+    // 添加状态筛选
     const statusUpper = status.toUpperCase();
     // 检查状态是否是有效的 PostStatus 枚举值
     if (Object.values(PostStatus).includes(statusUpper as PostStatus)) {
