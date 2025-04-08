@@ -93,11 +93,7 @@ const PostCard = ({
   post: Post & { wechatPublish?: WechatPublish };
 }) => {
   const [messageApi, contextHolder] = message.useMessage();
-  const cover = post.mediaFiles.length > 0 ? post.mediaFiles[0] : "";
-
   const { updatePost } = usePostsStore();
-
-  const restMediaFiles = post.mediaFiles.slice(1);
 
   const handleCopy = (cardId: string) => {
     const [content, innerText] = getCardInnerHtml(cardId);
