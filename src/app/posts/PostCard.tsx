@@ -10,7 +10,7 @@ import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { timeAgo } from "@/utils/formatDate";
-import MediaFile from "./MediaFile";
+import { MediaGrid } from "@/components/MediaGrid";
 import "./markdown-styles.css"; // 引入样式文件
 import usePostsStore from "@/store/PostsStore";
 
@@ -196,14 +196,7 @@ const PostCard = ({
             }}
             direction="vertical"
           >
-            {cover && <MediaFile file={cover} />}
-            {restMediaFiles.length > 0 && (
-              <Space size={16} wrap>
-                {restMediaFiles.map((file, index) => (
-                  <MediaFile key={index} file={file} />
-                ))}
-              </Space>
-            )}
+            <MediaGrid files={post.mediaFiles} />
           </Space>
 
           <ReactMarkdown

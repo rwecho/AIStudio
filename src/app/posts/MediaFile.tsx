@@ -36,6 +36,7 @@ const MediaFile = ({ file }: { file: string }) => {
           alt="Media"
           style={{
             maxWidth: "100%",
+            width: "100%",
             maxHeight: "300px",
             objectFit: "cover",
           }}
@@ -45,7 +46,12 @@ const MediaFile = ({ file }: { file: string }) => {
       return (
         <video
           controls
-          style={{ maxWidth: "100%", maxHeight: "300px", objectFit: "cover" }}
+          style={{
+            maxWidth: "100%",
+            width: "100%",
+            maxHeight: "300px",
+            objectFit: "cover",
+          }}
         >
           <source src={fileUrl} />
           您的浏览器不支持视频播放

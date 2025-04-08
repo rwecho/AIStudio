@@ -1,0 +1,28 @@
+.mediaGrid {
+  display: grid;
+  grid-gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.halfWidth {
+  grid-column: span 1;
+}
+
+.thirdWidth {
+  grid-column: span 1;
+}
+
+.defaultWidth {
+  grid-column: span 1;
+}
+
+@media (max-width: 768px) {
+  .mediaGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
