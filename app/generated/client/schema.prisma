@@ -1,0 +1,73 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/client"
+}
+
+model Post {
+  id               String         @id @default(cuid())
+  title            String
+  content          String
+  formattedTitle   String?
+  formattedContent String?
+  link             String?
+  published        DateTime?
+  author           String?
+  source           String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  comments         Comment[]
+  views            Int            @default(0)
+  likes            Int            @default(0)
+  tags             String[]
+  keywords         String[]
+  sourceUrls       String[]
+  status           PostStatus     @default(DRAFT)
+  isApproved       Boolean        @default(false)
+  isCleaned        Boolean        @default(false)
+  hasCoverImage    Boolean        @default(false)
+  coverImage       String?
+  mediaFiles       String[]
+  wechatPublish    WechatPublish?
+}
+
+enum PostStatus {
+  DRAFT // 草稿
+  PENDING // 待审核
+  PUBLISHED // 已发布
+  REJECTED // 被拒绝
+  ARCHIVED // 已归档
+}
+
+enum WechatPublishStatus {
+  PENDING // 待发布
+  PUBLISHED // 已发布
+  FAILED // 发布失败
+}
+
+model WechatPublish {
+  id        String              @id @default(cuid())
+  post      Post                @relation(fields: [postId], references: [id])
+  postId    String              @unique
+  status    WechatPublishStatus @default(PENDING)
+  content   String // 发布的内容
+  error     String? // 发布失败的错误信息
+  mediaId   String? // 微信返回的 media_id
+  publishId String? // 微信返回的 publish_id
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  content   String
+  author    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  post      Post     @relation(fields: [postId], references: [id])
+}
