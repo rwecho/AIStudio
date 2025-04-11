@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { Post, WechatPublishStatus } from "../generated/client";
-import PublishToWechat from "./PublishToWechat";
+import { Post } from "../generated/client";
 import Media from "./Media";
 
 // 移除 FC 类型和 useState，使其成为服务器组件

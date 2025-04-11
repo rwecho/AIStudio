@@ -22,7 +22,7 @@ export const LoadMorePosts: React.FC<LoadMorePostsProps> = ({
   const loaderRef = useRef(null);
 
   // 加载更多文章
-  const loadMorePosts = async () => {
+  const loadMorePosts = useCallback(async () => {
     if (loading || !hasMore) return;
 
     setLoading(true);
@@ -41,8 +41,7 @@ export const LoadMorePosts: React.FC<LoadMorePostsProps> = ({
     } finally {
       setLoading(false);
     }
-  };
-
+  }, [loading, hasMore, page]);
   // 初始化状态
   useEffect(() => {
     setPosts([]);
@@ -70,7 +69,7 @@ export const LoadMorePosts: React.FC<LoadMorePostsProps> = ({
         observer.unobserve(currentLoaderRef);
       }
     };
-  }, [hasMore, loading, page]);
+  }, [hasMore, loadMorePosts, loading, page]);
 
   // 如果没有更多内容可加载且没有已加载的额外内容，不渲染组件
   if (!hasMore && posts.length === 0) {

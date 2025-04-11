@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "../../services/prisma";
 import { PostStatus, WechatPublishStatus } from "../../generated/client";
-import ImageButton from "../../components/ImageButton";
 import {
   generateArticleJsonLd,
   generateArticleMetadata,
@@ -115,9 +114,6 @@ export default async function PostPage({
         day: "numeric",
       })
     : null;
-
-  // 使用格式化内容（如果有）
-  const content = post.formattedContent || post.content;
 
   // 获取文章的精简描述用于 JSON-LD
   const plainTextContent = post.formattedContent
