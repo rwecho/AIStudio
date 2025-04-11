@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AiStudiox.design - 科技新闻网站
 
-## Getting Started
+## 简介
 
-First, run the development server:
+AiStudiox.design 是一个专注于科技新闻的网站，旨在为读者提供及时、准确、深入的科技资讯和分析。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 功能特性
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+*   **最新科技资讯：** 每日更新最新的科技新闻，涵盖人工智能、机器学习。
+*   **深度分析报道：** 提供对科技事件和趋势的深度分析报道，帮助读者理解科技发展的本质和未来方向。
+*   **行业洞察：** 关注科技行业的发展动态，提供行业报告、专家观点和企业案例。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 域名
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+[AiStudiox.design](https://aistudiox.design)
 
-## Learn More
+## 目标用户
 
-To learn more about Next.js, take a look at the following resources:
+*   科技爱好者
+*   科技从业者
+*   投资者
+*   对科技感兴趣的普通读者
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 如何贡献
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+欢迎大家为 AiStudiox.design 贡献内容和代码！请参考 [CONTRIBUTING.md](CONTRIBUTING.md) 文件了解更多信息。
 
-## Deploy on Vercel
+## 许可证
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+\[请在此处填写许可证信息，例如：MIT License]

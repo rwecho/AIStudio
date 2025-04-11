@@ -1,11 +1,7 @@
 import { Metadata } from "next";
+import { siteDescription, siteName, siteUrl } from "../services/consts";
 
 // 网站基础配置
-const siteName = "科技前沿";
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://tech-news.example.com";
-const siteDescription =
-  "最新科技资讯，尽在掌握。提供全球最新科技新闻、产品评测、深度解析。";
 
 interface GenerateMetadataOptions {
   title?: string;
