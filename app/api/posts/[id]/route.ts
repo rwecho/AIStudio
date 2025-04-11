@@ -3,7 +3,10 @@ import { NextResponse } from "next/server";
 import { formatPost } from "../formatPost";
 
 // 获取单篇文章详情
-export async function GET({ params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const id = (await params).id;
 
