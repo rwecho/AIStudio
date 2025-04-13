@@ -42,6 +42,10 @@ export async function GET(request: Request) {
   const source = getParamCaseInsensitive(searchParams, "source");
   const sources = getParamCaseInsensitive(searchParams, "sources");
   const wechatStatus = getParamCaseInsensitive(searchParams, "wechatStatus");
+  const includeWechatPublish = getParamCaseInsensitive(
+    searchParams,
+    "includeWechatPublish"
+  );
 
   // 构建查询条件
   const where = {} as {
@@ -136,9 +140,9 @@ export async function GET(request: Request) {
 
   const posts = await prisma.post.findMany({
     where,
-    // include: {
-    //   wechatPublish: true, // 包含微信发布状态
-    // },
+    include: {
+      wechatPublish: includeWechatPublish === "true", // 包含微信发布状态
+    },
     take: pageSize,
     skip: (page - 1) * pageSize,
     orderBy: {
