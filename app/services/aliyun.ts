@@ -19,10 +19,7 @@ export function createOSSClient() {
 }
 
 // 上传文件到阿里云 OSS
-export async function uploadToAliyun(
-  fileBuffer: Buffer,
-  filePath: string
-): Promise<string> {
+export async function uploadToAliyun(fileBuffer: Buffer, filePath: string) {
   try {
     const client = createOSSClient();
     const result = await client.send(
@@ -32,7 +29,16 @@ export async function uploadToAliyun(
         Body: fileBuffer,
       })
     );
-    return result.$metadata.httpStatusCode === 200 ? filePath : "";
+
+    // 检查上传是否成功
+    if (result.$metadata.httpStatusCode !== 200) {
+      throw new Error("上传文件失败");
+    }
+
+    return {
+      filePath,
+      fileUrl: await getAliyunFileUrl(filePath),
+    };
   } catch (error) {
     console.error("上传到阿里云OSS失败:", error);
     throw new Error("文件上传失败");
