@@ -74,7 +74,7 @@ export default async function Home({
   const hasMore = count > top;
 
   return (
-    <div className="container mx-auto px-4 py-4">
+    <div className="container mx-auto px-4 py-0">
       {/* 新设计的 Header 和 Navbar */}
       <header className="mb-8">
         <div className="flex flex-col md:flex-row items-center justify-between py-4 border-b border-gray-200">
