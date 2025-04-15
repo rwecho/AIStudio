@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Article, ArticleTranslation } from "../generated/client";
 import Media from "./Media";
+import { readableDate } from "../services/dateutils";
 
 const PostCard = ({
   article,
@@ -11,15 +12,6 @@ const PostCard = ({
   translation: ArticleTranslation;
   lang: string;
 }) => {
-  // 获取发布日期的格式化显示
-  const formattedDate = article.createdAt
-    ? new Date(article.createdAt).toLocaleDateString("zh-CN", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : null;
-
   // 提取内容摘要（限制在100个字符以内）
   const excerpt =
     translation.summary ||
@@ -64,7 +56,7 @@ const PostCard = ({
           <div className="flex justify-between items-center text-sm text-gray-500">
             <span>{article.author || "未知作者"}</span>
             <div className="flex items-center gap-2">
-              <span>{formattedDate || "未知日期"}</span>
+              <span>{readableDate(article.createdAt) || "未知日期"}</span>
             </div>
           </div>
         </div>

@@ -55,7 +55,7 @@ export default async function Home({
     },
     take: top, // 默认获取50条
     orderBy: {
-      publishedAt: "desc", // 按发布时间倒序
+      createdAt: "desc", // 按发布时间倒序
     },
   });
 
