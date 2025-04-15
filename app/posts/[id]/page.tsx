@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import prisma from "../../services/prisma";
-import { ArticleStatus } from "../../generated/client";
 import {
   generateArticleJsonLd,
   generateArticleMetadata,
@@ -23,9 +22,6 @@ export const revalidate = 6000; // 单位为秒，1小时 = 3600秒
 // 预生成前50篇文章的静态页面
 export async function generateStaticParams() {
   const articles = await prisma.article.findMany({
-    where: {
-      status: ArticleStatus.PUBLISHED,
-    },
     select: { id: true },
     orderBy: {
       publishedAt: "desc",
