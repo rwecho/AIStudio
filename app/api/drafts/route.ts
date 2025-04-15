@@ -1,6 +1,8 @@
 // filepath: /Volumes/MacMiniDisk/Users/echo/workspace/AIStudio/app/api/drafts/route.ts
+import { uploadToAliyun } from "@/app/services/aliyun";
 import prisma from "@/app/services/prisma";
 import { NextResponse } from "next/server";
+import { v5 } from "uuid";
 
 // 辅助函数：不区分大小写获取URL参数
 function getParamCaseInsensitive(
@@ -66,13 +68,44 @@ export async function GET(request: Request) {
 // 创建新草稿
 export async function POST(request: Request) {
   try {
-    const data = await request.json();
+    const formData = await request.formData();
+
+    const title = formData.get("title")?.toString();
+    const content = formData.get("content")?.toString();
+    const source = formData.get("source")?.toString();
+    const author = formData.get("author")?.toString();
+    const publishedAt = formData.get("published")?.toString();
+    const link = formData.get("link")?.toString();
+
+    // 处理媒体文件
+    const mediaFiles = (formData.getAll("files") || []) as File[];
+
+    const ossKeys = [];
+
+    // 上传 媒体文件到阿里云
+    for (const mediaFile of mediaFiles) {
+      const file = mediaFile as File;
+      const fileBuffer = Buffer.from(await file.arrayBuffer());
+      // 上传到阿里云
+      const fullUuid = link ? v5(link, v5.URL) : v5(file.name, v5.DNS);
+      const uuid = fullUuid.substring(0, 8);
+      const filePath = `${uuid}/${file.name}`;
+      const ossKey = await uploadToAliyun(fileBuffer, filePath);
+      ossKeys.push(ossKey);
+    }
 
     // 创建草稿
     const draft = await prisma.draft.create({
       data: {
-        author: data.author || "",
-        data: data, // 存储完整的 JSON 数据
+        author: author || "",
+        data: {
+          title,
+          content,
+          summary: source,
+          publishedAt,
+          link,
+          mediaFiles: ossKeys, // 存储上传的媒体文件的OSS键
+        }, // 存储完整的 JSON 数据
       },
     });
 
@@ -169,7 +202,7 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({
       message: "草稿已成功转换为文章",
-      article,  
+      article,
     });
   } catch (error) {
     console.error("转换草稿失败:", error);
