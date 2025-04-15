@@ -43,10 +43,10 @@ export async function generateMetadata({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const lang = (searchParams.lang as string) || "cn"; // 默认中文
+  const lang = ((await searchParams).lang as string) || "cn"; // 默认中文
 
   const article = await prisma.article.findUnique({
     where: { id },
@@ -120,10 +120,10 @@ export default async function ArticlePage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   // 获取当前语言或默认中文
-  const lang = (searchParams.lang as string) || "cn"; // 默认中文
+  const lang = ((await searchParams).lang as string) || "cn"; // 默认中文
 
   const article = await getArticle((await params).id, lang);
 
