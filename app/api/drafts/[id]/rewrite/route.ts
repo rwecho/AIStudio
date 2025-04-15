@@ -106,3 +106,30 @@ export async function POST(
   });
   return NextResponse.json(article, { status: 200 });
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const id = (await params).id;
+
+  // 检查草稿是否存在
+  const draft = await prisma.draft.findUnique({
+    where: { id },
+  });
+
+  if (!draft) {
+    return NextResponse.json({ error: "草稿不存在" }, { status: 404 });
+  }
+
+  // 删除草稿
+  await prisma.draft.update({
+    where: { id },
+    data: {
+      isDeleted: true,
+      updatedAt: new Date(),
+    },
+  });
+
+  return NextResponse.json({ message: "草稿已删除" }, { status: 200 });
+}
