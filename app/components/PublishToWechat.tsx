@@ -136,22 +136,19 @@ export default function PublishToWechat({
     setSuccess(false);
 
     try {
-      const cover = translation.cover
-        ? `${process.env.NEXT_PUBLIC_API_URL}/api/oss?ossKey=${translation.cover}`
-        : "";
-
-      const response = await fetch("/api/posts/wechat", {
-        method: "POST",
+      const response = await fetch(`/api/posts/${article.id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: article.id,
-          lang: lang,
-          title: translation.title,
-          content: content,
-          cover: cover,
-          author: article.author || "",
+          wechatPublish: {
+            status: WechatPublishStatus.PENDING,
+            content: content,
+            error: null,
+            mediaId: null,
+            publishId: null,
+          },
         }),
       });
 
