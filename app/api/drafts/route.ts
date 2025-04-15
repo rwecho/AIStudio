@@ -90,7 +90,7 @@ export async function POST(request: Request) {
       const fullUuid = link ? v5(link, v5.URL) : v5(file.name, v5.DNS);
       const uuid = fullUuid.substring(0, 8);
       const filePath = `${uuid}/${file.name}`;
-      const ossKey = await uploadToAliyun(fileBuffer, filePath);
+      const ossKey = (await uploadToAliyun(fileBuffer, filePath)).filePath;
       ossKeys.push(ossKey);
     }
 
