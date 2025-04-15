@@ -164,7 +164,7 @@ export async function GET(request: Request) {
   const total = await prisma.article.count({ where });
 
   return NextResponse.json({
-    items: {
+    items: [
       // exclude other languages
       ...articles.map((article) => ({
         ...article,
@@ -172,7 +172,7 @@ export async function GET(request: Request) {
           (translation) => translation.lang === lang
         ),
       })),
-    },
+    ],
     total,
     hasMore: page * pageSize < total,
   });

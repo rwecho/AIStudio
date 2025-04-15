@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "../../services/prisma";
 import { ArticleStatus } from "../../generated/client";
@@ -165,12 +164,6 @@ export default async function ArticlePage({
     <div className="container mx-auto px-4 py-8">
       {/* 注入文章的结构化数据 */}
       <JsonLd data={articleJsonLd} />
-
-      <div className="flex justify-between items-center mb-6">
-        <Link href="/" className="text-blue-500 hover:underline inline-block">
-          &larr; 返回首页
-        </Link>
-      </div>
 
       <article
         className="bg-white rounded-lg shadow-md overflow-hidden"
