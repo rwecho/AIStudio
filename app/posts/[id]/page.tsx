@@ -160,13 +160,6 @@ export default async function ArticlePage({
     tags: translation.keywords,
   });
 
-  // 获取所有可用语言版本
-  const availableLanguages = await prisma.articleTranslation.findMany({
-    where: { articleId: article.id },
-    select: { lang: true },
-    orderBy: { lang: "asc" },
-  });
-
   return (
     <div className="container mx-auto px-4 py-8">
       {/* 注入文章的结构化数据 */}
@@ -176,25 +169,6 @@ export default async function ArticlePage({
         <Link href="/" className="text-blue-500 hover:underline inline-block">
           &larr; 返回首页
         </Link>
-
-        {/* 语言切换 */}
-        {availableLanguages.length > 1 && (
-          <div className="flex gap-2">
-            {availableLanguages.map((langOption) => (
-              <Link
-                key={langOption.lang}
-                href={`/posts/${article.id}?lang=${langOption.lang}`}
-                className={`px-2 py-1 rounded ${
-                  langOption.lang === lang
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 hover:bg-gray-300"
-                }`}
-              >
-                {langOption.lang.toUpperCase()}
-              </Link>
-            ))}
-          </div>
-        )}
       </div>
 
       <article
@@ -237,9 +211,6 @@ export default async function ArticlePage({
             {formattedDate && (
               <span className="mr-4">发布于: {formattedDate}</span>
             )}
-            <span className="px-2 py-0.5 bg-gray-200 rounded-full uppercase">
-              {lang}
-            </span>
           </div>
 
           {translation.summary && (

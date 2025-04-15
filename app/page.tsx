@@ -3,7 +3,7 @@ import PostCard from "./components/Post";
 import { LoadMorePosts } from "./components/LoadMorePosts";
 import { generateArticleMetadata } from "./lib/metadata";
 import { Metadata } from "next";
-import Link from "next/link";
+import { cookies } from "next/headers";
 
 // 设置页面为ISR模式，每10分钟重新生成一次
 export const revalidate = 600; // 单位为秒，10分钟 = 600秒
@@ -25,19 +25,15 @@ export const metadata: Metadata = generateArticleMetadata({
   type: "website",
 });
 
-export default async function Home({
-  params,
-}: {
-  params: Promise<{ lang?: string }>;
-}) {
-  // 获取当前语言或默认为中文
-  const lang = (await params).lang || "cn";
+export default async function Home() {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("lang")?.value || "cn"; // 默认中文
 
   // 服务器端获取文章数据
   const top = 50;
   const articles = await prisma.article.findMany({
     where: {
-      status: "PUBLISHED", // 只获取已发布的文章
+      // status: "PUBLISHED", // 只获取已发布的文章
       translations: {
         some: {
           lang, // 筛选指定语言的翻译
@@ -58,7 +54,7 @@ export default async function Home({
   // 检查是否还有更多文章可以加载
   const count = await prisma.article.count({
     where: {
-      status: "PUBLISHED",
+      // status: "PUBLISHED",
       translations: {
         some: {
           lang,
@@ -69,17 +65,6 @@ export default async function Home({
 
   const hasMore = count > top;
 
-  // 获取所有可用的语言
-  const availableLanguages = await prisma.articleTranslation.findMany({
-    select: {
-      lang: true,
-    },
-    distinct: ["lang"],
-    orderBy: {
-      lang: "asc",
-    },
-  });
-
   return (
     <div className="container mx-auto px-4 py-8">
       <header className="mb-10">
@@ -87,25 +72,6 @@ export default async function Home({
         <p className="text-xl text-gray-600 text-center">
           最新科技资讯，尽在掌握
         </p>
-
-        {/* 语言切换 */}
-        {availableLanguages.length > 1 && (
-          <div className="flex justify-center mt-4 gap-2">
-            {availableLanguages.map((langOption) => (
-              <Link
-                key={langOption.lang}
-                href={`/?lang=${langOption.lang}`}
-                className={`px-3 py-1 rounded-full ${
-                  langOption.lang === lang
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 hover:bg-gray-300"
-                }`}
-              >
-                {langOption.lang.toUpperCase()}
-              </Link>
-            ))}
-          </div>
-        )}
       </header>
 
       <section>
@@ -116,7 +82,15 @@ export default async function Home({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {articles.map((article) => (
-              <PostCard key={article.id} article={article} lang={lang} />
+              <>
+                {article.translations.length > 0 && (
+                  <PostCard
+                    key={article.id}
+                    article={article}
+                    translation={article.translations[0]}
+                  />
+                )}
+              </>
             ))}
           </div>
         )}

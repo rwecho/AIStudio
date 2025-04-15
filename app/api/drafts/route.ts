@@ -35,15 +35,21 @@ export async function GET(request: Request) {
   const page = Number(getParamCaseInsensitive(searchParams, "page")) || 1;
   const pageSize =
     Number(getParamCaseInsensitive(searchParams, "pageSize")) || 10;
-  const author = getParamCaseInsensitive(searchParams, "author");
+  const authors = getParamCaseInsensitive(searchParams, "authors");
 
   // 构建查询条件
-  const where = {} as {
-    author?: string;
+  const where = {
+    isDeleted: false,
+  } as {
+    author?: string | { in: string[] };
+    isDeleted?: boolean;
   };
 
-  if (author) {
-    where.author = author;
+  if (authors) {
+    const authorList = authors.split(",");
+    where.author = {
+      in: authorList,
+    };
   }
 
   // 查询草稿列表
@@ -101,7 +107,7 @@ export async function POST(request: Request) {
         data: {
           title,
           content,
-          summary: source,
+          source,
           publishedAt,
           link,
           mediaFiles: ossKeys, // 存储上传的媒体文件的OSS键
@@ -113,41 +119,6 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("创建草稿失败:", error);
     return NextResponse.json({ error: "创建草稿失败" }, { status: 500 });
-  }
-}
-
-// 更新草稿
-export async function PUT(request: Request) {
-  try {
-    const data = await request.json();
-    const id = data.id;
-
-    if (!id) {
-      return NextResponse.json({ error: "必须提供草稿ID" }, { status: 400 });
-    }
-
-    // 检查草稿是否存在
-    const existingDraft = await prisma.draft.findUnique({
-      where: { id },
-    });
-
-    if (!existingDraft) {
-      return NextResponse.json({ error: "草稿不存在" }, { status: 404 });
-    }
-
-    // 更新草稿
-    const updatedDraft = await prisma.draft.update({
-      where: { id },
-      data: {
-        author: data.author || existingDraft.author,
-        data: data, // 存储完整的 JSON 数据
-      },
-    });
-
-    return NextResponse.json(updatedDraft);
-  } catch (error) {
-    console.error("更新草稿失败:", error);
-    return NextResponse.json({ error: "更新草稿失败" }, { status: 500 });
   }
 }
 

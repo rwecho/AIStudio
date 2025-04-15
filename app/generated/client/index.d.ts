@@ -1442,6 +1442,7 @@ export namespace Prisma {
     author: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    isDeleted: boolean | null
   }
 
   export type DraftMaxAggregateOutputType = {
@@ -1449,6 +1450,7 @@ export namespace Prisma {
     author: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    isDeleted: boolean | null
   }
 
   export type DraftCountAggregateOutputType = {
@@ -1457,6 +1459,7 @@ export namespace Prisma {
     data: number
     createdAt: number
     updatedAt: number
+    isDeleted: number
     _all: number
   }
 
@@ -1466,6 +1469,7 @@ export namespace Prisma {
     author?: true
     createdAt?: true
     updatedAt?: true
+    isDeleted?: true
   }
 
   export type DraftMaxAggregateInputType = {
@@ -1473,6 +1477,7 @@ export namespace Prisma {
     author?: true
     createdAt?: true
     updatedAt?: true
+    isDeleted?: true
   }
 
   export type DraftCountAggregateInputType = {
@@ -1481,6 +1486,7 @@ export namespace Prisma {
     data?: true
     createdAt?: true
     updatedAt?: true
+    isDeleted?: true
     _all?: true
   }
 
@@ -1562,6 +1568,7 @@ export namespace Prisma {
     data: JsonValue
     createdAt: Date
     updatedAt: Date
+    isDeleted: boolean
     _count: DraftCountAggregateOutputType | null
     _min: DraftMinAggregateOutputType | null
     _max: DraftMaxAggregateOutputType | null
@@ -1587,6 +1594,7 @@ export namespace Prisma {
     data?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    isDeleted?: boolean
   }, ExtArgs["result"]["draft"]>
 
   export type DraftSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1595,6 +1603,7 @@ export namespace Prisma {
     data?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    isDeleted?: boolean
   }, ExtArgs["result"]["draft"]>
 
   export type DraftSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1603,6 +1612,7 @@ export namespace Prisma {
     data?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    isDeleted?: boolean
   }, ExtArgs["result"]["draft"]>
 
   export type DraftSelectScalar = {
@@ -1611,9 +1621,10 @@ export namespace Prisma {
     data?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    isDeleted?: boolean
   }
 
-  export type DraftOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "author" | "data" | "createdAt" | "updatedAt", ExtArgs["result"]["draft"]>
+  export type DraftOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "author" | "data" | "createdAt" | "updatedAt" | "isDeleted", ExtArgs["result"]["draft"]>
 
   export type $DraftPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Draft"
@@ -1624,6 +1635,7 @@ export namespace Prisma {
       data: Prisma.JsonValue
       createdAt: Date
       updatedAt: Date
+      isDeleted: boolean
     }, ExtArgs["result"]["draft"]>
     composites: {}
   }
@@ -2052,6 +2064,7 @@ export namespace Prisma {
     readonly data: FieldRef<"Draft", 'Json'>
     readonly createdAt: FieldRef<"Draft", 'DateTime'>
     readonly updatedAt: FieldRef<"Draft", 'DateTime'>
+    readonly isDeleted: FieldRef<"Draft", 'Boolean'>
   }
     
 
@@ -3659,6 +3672,7 @@ export namespace Prisma {
     title: number
     summary: number
     content: number
+    mediaFiles: number
     coverPrompt: number
     cover: number
     categories: number
@@ -3702,6 +3716,7 @@ export namespace Prisma {
     title?: true
     summary?: true
     content?: true
+    mediaFiles?: true
     coverPrompt?: true
     cover?: true
     categories?: true
@@ -3790,6 +3805,7 @@ export namespace Prisma {
     title: string
     summary: string | null
     content: string
+    mediaFiles: string[]
     coverPrompt: string | null
     cover: string | null
     categories: string[]
@@ -3822,6 +3838,7 @@ export namespace Prisma {
     title?: boolean
     summary?: boolean
     content?: boolean
+    mediaFiles?: boolean
     coverPrompt?: boolean
     cover?: boolean
     categories?: boolean
@@ -3840,6 +3857,7 @@ export namespace Prisma {
     title?: boolean
     summary?: boolean
     content?: boolean
+    mediaFiles?: boolean
     coverPrompt?: boolean
     cover?: boolean
     categories?: boolean
@@ -3856,6 +3874,7 @@ export namespace Prisma {
     title?: boolean
     summary?: boolean
     content?: boolean
+    mediaFiles?: boolean
     coverPrompt?: boolean
     cover?: boolean
     categories?: boolean
@@ -3872,6 +3891,7 @@ export namespace Prisma {
     title?: boolean
     summary?: boolean
     content?: boolean
+    mediaFiles?: boolean
     coverPrompt?: boolean
     cover?: boolean
     categories?: boolean
@@ -3880,7 +3900,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ArticleTranslationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "articleId" | "lang" | "title" | "summary" | "content" | "coverPrompt" | "cover" | "categories" | "keywords" | "createdAt" | "updatedAt", ExtArgs["result"]["articleTranslation"]>
+  export type ArticleTranslationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "articleId" | "lang" | "title" | "summary" | "content" | "mediaFiles" | "coverPrompt" | "cover" | "categories" | "keywords" | "createdAt" | "updatedAt", ExtArgs["result"]["articleTranslation"]>
   export type ArticleTranslationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     article?: boolean | ArticleDefaultArgs<ExtArgs>
     references?: boolean | ArticleTranslation$referencesArgs<ExtArgs>
@@ -3906,6 +3926,7 @@ export namespace Prisma {
       title: string
       summary: string | null
       content: string
+      mediaFiles: string[]
       coverPrompt: string | null
       cover: string | null
       categories: string[]
@@ -4343,6 +4364,7 @@ export namespace Prisma {
     readonly title: FieldRef<"ArticleTranslation", 'String'>
     readonly summary: FieldRef<"ArticleTranslation", 'String'>
     readonly content: FieldRef<"ArticleTranslation", 'String'>
+    readonly mediaFiles: FieldRef<"ArticleTranslation", 'String[]'>
     readonly coverPrompt: FieldRef<"ArticleTranslation", 'String'>
     readonly cover: FieldRef<"ArticleTranslation", 'String'>
     readonly categories: FieldRef<"ArticleTranslation", 'String[]'>
@@ -8032,7 +8054,8 @@ export namespace Prisma {
     author: 'author',
     data: 'data',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    isDeleted: 'isDeleted'
   };
 
   export type DraftScalarFieldEnum = (typeof DraftScalarFieldEnum)[keyof typeof DraftScalarFieldEnum]
@@ -8059,6 +8082,7 @@ export namespace Prisma {
     title: 'title',
     summary: 'summary',
     content: 'content',
+    mediaFiles: 'mediaFiles',
     coverPrompt: 'coverPrompt',
     cover: 'cover',
     categories: 'categories',
@@ -8195,6 +8219,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'ArticleStatus'
    */
   export type EnumArticleStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleStatus'>
@@ -8262,6 +8293,7 @@ export namespace Prisma {
     data?: JsonFilter<"Draft">
     createdAt?: DateTimeFilter<"Draft"> | Date | string
     updatedAt?: DateTimeFilter<"Draft"> | Date | string
+    isDeleted?: BoolFilter<"Draft"> | boolean
   }
 
   export type DraftOrderByWithRelationInput = {
@@ -8270,6 +8302,7 @@ export namespace Prisma {
     data?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isDeleted?: SortOrder
   }
 
   export type DraftWhereUniqueInput = Prisma.AtLeast<{
@@ -8281,6 +8314,7 @@ export namespace Prisma {
     data?: JsonFilter<"Draft">
     createdAt?: DateTimeFilter<"Draft"> | Date | string
     updatedAt?: DateTimeFilter<"Draft"> | Date | string
+    isDeleted?: BoolFilter<"Draft"> | boolean
   }, "id">
 
   export type DraftOrderByWithAggregationInput = {
@@ -8289,6 +8323,7 @@ export namespace Prisma {
     data?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isDeleted?: SortOrder
     _count?: DraftCountOrderByAggregateInput
     _max?: DraftMaxOrderByAggregateInput
     _min?: DraftMinOrderByAggregateInput
@@ -8303,6 +8338,7 @@ export namespace Prisma {
     data?: JsonWithAggregatesFilter<"Draft">
     createdAt?: DateTimeWithAggregatesFilter<"Draft"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Draft"> | Date | string
+    isDeleted?: BoolWithAggregatesFilter<"Draft"> | boolean
   }
 
   export type ArticleWhereInput = {
@@ -8393,6 +8429,7 @@ export namespace Prisma {
     title?: StringFilter<"ArticleTranslation"> | string
     summary?: StringNullableFilter<"ArticleTranslation"> | string | null
     content?: StringFilter<"ArticleTranslation"> | string
+    mediaFiles?: StringNullableListFilter<"ArticleTranslation">
     coverPrompt?: StringNullableFilter<"ArticleTranslation"> | string | null
     cover?: StringNullableFilter<"ArticleTranslation"> | string | null
     categories?: StringNullableListFilter<"ArticleTranslation">
@@ -8410,6 +8447,7 @@ export namespace Prisma {
     title?: SortOrder
     summary?: SortOrderInput | SortOrder
     content?: SortOrder
+    mediaFiles?: SortOrder
     coverPrompt?: SortOrderInput | SortOrder
     cover?: SortOrderInput | SortOrder
     categories?: SortOrder
@@ -8431,6 +8469,7 @@ export namespace Prisma {
     title?: StringFilter<"ArticleTranslation"> | string
     summary?: StringNullableFilter<"ArticleTranslation"> | string | null
     content?: StringFilter<"ArticleTranslation"> | string
+    mediaFiles?: StringNullableListFilter<"ArticleTranslation">
     coverPrompt?: StringNullableFilter<"ArticleTranslation"> | string | null
     cover?: StringNullableFilter<"ArticleTranslation"> | string | null
     categories?: StringNullableListFilter<"ArticleTranslation">
@@ -8448,6 +8487,7 @@ export namespace Prisma {
     title?: SortOrder
     summary?: SortOrderInput | SortOrder
     content?: SortOrder
+    mediaFiles?: SortOrder
     coverPrompt?: SortOrderInput | SortOrder
     cover?: SortOrderInput | SortOrder
     categories?: SortOrder
@@ -8469,6 +8509,7 @@ export namespace Prisma {
     title?: StringWithAggregatesFilter<"ArticleTranslation"> | string
     summary?: StringNullableWithAggregatesFilter<"ArticleTranslation"> | string | null
     content?: StringWithAggregatesFilter<"ArticleTranslation"> | string
+    mediaFiles?: StringNullableListFilter<"ArticleTranslation">
     coverPrompt?: StringNullableWithAggregatesFilter<"ArticleTranslation"> | string | null
     cover?: StringNullableWithAggregatesFilter<"ArticleTranslation"> | string | null
     categories?: StringNullableListFilter<"ArticleTranslation">
@@ -8668,6 +8709,7 @@ export namespace Prisma {
     data: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    isDeleted?: boolean
   }
 
   export type DraftUncheckedCreateInput = {
@@ -8676,6 +8718,7 @@ export namespace Prisma {
     data: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    isDeleted?: boolean
   }
 
   export type DraftUpdateInput = {
@@ -8684,6 +8727,7 @@ export namespace Prisma {
     data?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type DraftUncheckedUpdateInput = {
@@ -8692,6 +8736,7 @@ export namespace Prisma {
     data?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type DraftCreateManyInput = {
@@ -8700,6 +8745,7 @@ export namespace Prisma {
     data: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    isDeleted?: boolean
   }
 
   export type DraftUpdateManyMutationInput = {
@@ -8708,6 +8754,7 @@ export namespace Prisma {
     data?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type DraftUncheckedUpdateManyInput = {
@@ -8716,6 +8763,7 @@ export namespace Prisma {
     data?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ArticleCreateInput = {
@@ -8813,6 +8861,7 @@ export namespace Prisma {
     title: string
     summary?: string | null
     content: string
+    mediaFiles?: ArticleTranslationCreatemediaFilesInput | string[]
     coverPrompt?: string | null
     cover?: string | null
     categories?: ArticleTranslationCreatecategoriesInput | string[]
@@ -8830,6 +8879,7 @@ export namespace Prisma {
     title: string
     summary?: string | null
     content: string
+    mediaFiles?: ArticleTranslationCreatemediaFilesInput | string[]
     coverPrompt?: string | null
     cover?: string | null
     categories?: ArticleTranslationCreatecategoriesInput | string[]
@@ -8845,6 +8895,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     summary?: NullableStringFieldUpdateOperationsInput | string | null
     content?: StringFieldUpdateOperationsInput | string
+    mediaFiles?: ArticleTranslationUpdatemediaFilesInput | string[]
     coverPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     cover?: NullableStringFieldUpdateOperationsInput | string | null
     categories?: ArticleTranslationUpdatecategoriesInput | string[]
@@ -8862,6 +8913,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     summary?: NullableStringFieldUpdateOperationsInput | string | null
     content?: StringFieldUpdateOperationsInput | string
+    mediaFiles?: ArticleTranslationUpdatemediaFilesInput | string[]
     coverPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     cover?: NullableStringFieldUpdateOperationsInput | string | null
     categories?: ArticleTranslationUpdatecategoriesInput | string[]
@@ -8878,6 +8930,7 @@ export namespace Prisma {
     title: string
     summary?: string | null
     content: string
+    mediaFiles?: ArticleTranslationCreatemediaFilesInput | string[]
     coverPrompt?: string | null
     cover?: string | null
     categories?: ArticleTranslationCreatecategoriesInput | string[]
@@ -8892,6 +8945,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     summary?: NullableStringFieldUpdateOperationsInput | string | null
     content?: StringFieldUpdateOperationsInput | string
+    mediaFiles?: ArticleTranslationUpdatemediaFilesInput | string[]
     coverPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     cover?: NullableStringFieldUpdateOperationsInput | string | null
     categories?: ArticleTranslationUpdatecategoriesInput | string[]
@@ -8907,6 +8961,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     summary?: NullableStringFieldUpdateOperationsInput | string | null
     content?: StringFieldUpdateOperationsInput | string
+    mediaFiles?: ArticleTranslationUpdatemediaFilesInput | string[]
     coverPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     cover?: NullableStringFieldUpdateOperationsInput | string | null
     categories?: ArticleTranslationUpdatecategoriesInput | string[]
@@ -9172,6 +9227,11 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -9183,6 +9243,7 @@ export namespace Prisma {
     data?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isDeleted?: SortOrder
   }
 
   export type DraftMaxOrderByAggregateInput = {
@@ -9190,6 +9251,7 @@ export namespace Prisma {
     author?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isDeleted?: SortOrder
   }
 
   export type DraftMinOrderByAggregateInput = {
@@ -9197,6 +9259,7 @@ export namespace Prisma {
     author?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isDeleted?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -9273,6 +9336,14 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type DateTimeNullableFilter<$PrismaModel = never> = {
@@ -9447,6 +9518,7 @@ export namespace Prisma {
     title?: SortOrder
     summary?: SortOrder
     content?: SortOrder
+    mediaFiles?: SortOrder
     coverPrompt?: SortOrder
     cover?: SortOrder
     categories?: SortOrder
@@ -9599,6 +9671,10 @@ export namespace Prisma {
     set?: Date | string
   }
 
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type ArticleTranslationCreateNestedManyWithoutArticleInput = {
     create?: XOR<ArticleTranslationCreateWithoutArticleInput, ArticleTranslationUncheckedCreateWithoutArticleInput> | ArticleTranslationCreateWithoutArticleInput[] | ArticleTranslationUncheckedCreateWithoutArticleInput[]
     connectOrCreate?: ArticleTranslationCreateOrConnectWithoutArticleInput | ArticleTranslationCreateOrConnectWithoutArticleInput[]
@@ -9731,6 +9807,10 @@ export namespace Prisma {
     deleteMany?: CommentScalarWhereInput | CommentScalarWhereInput[]
   }
 
+  export type ArticleTranslationCreatemediaFilesInput = {
+    set: string[]
+  }
+
   export type ArticleTranslationCreatecategoriesInput = {
     set: string[]
   }
@@ -9757,6 +9837,11 @@ export namespace Prisma {
     connectOrCreate?: ReferenceCreateOrConnectWithoutArticleTranslationInput | ReferenceCreateOrConnectWithoutArticleTranslationInput[]
     createMany?: ReferenceCreateManyArticleTranslationInputEnvelope
     connect?: ReferenceWhereUniqueInput | ReferenceWhereUniqueInput[]
+  }
+
+  export type ArticleTranslationUpdatemediaFilesInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type ArticleTranslationUpdatecategoriesInput = {
@@ -9890,6 +9975,11 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -9981,6 +10071,14 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
@@ -10075,6 +10173,7 @@ export namespace Prisma {
     title: string
     summary?: string | null
     content: string
+    mediaFiles?: ArticleTranslationCreatemediaFilesInput | string[]
     coverPrompt?: string | null
     cover?: string | null
     categories?: ArticleTranslationCreatecategoriesInput | string[]
@@ -10090,6 +10189,7 @@ export namespace Prisma {
     title: string
     summary?: string | null
     content: string
+    mediaFiles?: ArticleTranslationCreatemediaFilesInput | string[]
     coverPrompt?: string | null
     cover?: string | null
     categories?: ArticleTranslationCreatecategoriesInput | string[]
@@ -10188,6 +10288,7 @@ export namespace Prisma {
     title?: StringFilter<"ArticleTranslation"> | string
     summary?: StringNullableFilter<"ArticleTranslation"> | string | null
     content?: StringFilter<"ArticleTranslation"> | string
+    mediaFiles?: StringNullableListFilter<"ArticleTranslation">
     coverPrompt?: StringNullableFilter<"ArticleTranslation"> | string | null
     cover?: StringNullableFilter<"ArticleTranslation"> | string | null
     categories?: StringNullableListFilter<"ArticleTranslation">
@@ -10379,6 +10480,7 @@ export namespace Prisma {
     title: string
     summary?: string | null
     content: string
+    mediaFiles?: ArticleTranslationCreatemediaFilesInput | string[]
     coverPrompt?: string | null
     cover?: string | null
     categories?: ArticleTranslationCreatecategoriesInput | string[]
@@ -10395,6 +10497,7 @@ export namespace Prisma {
     title: string
     summary?: string | null
     content: string
+    mediaFiles?: ArticleTranslationCreatemediaFilesInput | string[]
     coverPrompt?: string | null
     cover?: string | null
     categories?: ArticleTranslationCreatecategoriesInput | string[]
@@ -10425,6 +10528,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     summary?: NullableStringFieldUpdateOperationsInput | string | null
     content?: StringFieldUpdateOperationsInput | string
+    mediaFiles?: ArticleTranslationUpdatemediaFilesInput | string[]
     coverPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     cover?: NullableStringFieldUpdateOperationsInput | string | null
     categories?: ArticleTranslationUpdatecategoriesInput | string[]
@@ -10441,6 +10545,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     summary?: NullableStringFieldUpdateOperationsInput | string | null
     content?: StringFieldUpdateOperationsInput | string
+    mediaFiles?: ArticleTranslationUpdatemediaFilesInput | string[]
     coverPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     cover?: NullableStringFieldUpdateOperationsInput | string | null
     categories?: ArticleTranslationUpdatecategoriesInput | string[]
@@ -10591,6 +10696,7 @@ export namespace Prisma {
     title: string
     summary?: string | null
     content: string
+    mediaFiles?: ArticleTranslationCreatemediaFilesInput | string[]
     coverPrompt?: string | null
     cover?: string | null
     categories?: ArticleTranslationCreatecategoriesInput | string[]
@@ -10613,6 +10719,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     summary?: NullableStringFieldUpdateOperationsInput | string | null
     content?: StringFieldUpdateOperationsInput | string
+    mediaFiles?: ArticleTranslationUpdatemediaFilesInput | string[]
     coverPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     cover?: NullableStringFieldUpdateOperationsInput | string | null
     categories?: ArticleTranslationUpdatecategoriesInput | string[]
@@ -10628,6 +10735,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     summary?: NullableStringFieldUpdateOperationsInput | string | null
     content?: StringFieldUpdateOperationsInput | string
+    mediaFiles?: ArticleTranslationUpdatemediaFilesInput | string[]
     coverPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     cover?: NullableStringFieldUpdateOperationsInput | string | null
     categories?: ArticleTranslationUpdatecategoriesInput | string[]
@@ -10643,6 +10751,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     summary?: NullableStringFieldUpdateOperationsInput | string | null
     content?: StringFieldUpdateOperationsInput | string
+    mediaFiles?: ArticleTranslationUpdatemediaFilesInput | string[]
     coverPrompt?: NullableStringFieldUpdateOperationsInput | string | null
     cover?: NullableStringFieldUpdateOperationsInput | string | null
     categories?: ArticleTranslationUpdatecategoriesInput | string[]

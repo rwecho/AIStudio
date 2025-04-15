@@ -2,29 +2,16 @@ import Link from "next/link";
 import { Article, ArticleTranslation } from "../generated/client";
 import Media from "./Media";
 
-interface ArticleWithTranslation extends Article {
-  translations?: ArticleTranslation[];
-}
-
 const PostCard = ({
   article,
-  lang = "cn",
+  translation,
 }: {
-  article: ArticleWithTranslation;
-  lang?: string;
+  article: Article;
+  translation: ArticleTranslation;
 }) => {
-  // 获取当前语言的翻译
-  const translation =
-    article.translations?.find((t) => t.lang === lang) ||
-    article.translations?.[0];
-
-  if (!translation) {
-    return null; // 如果没有翻译，不显示
-  }
-
   // 获取发布日期的格式化显示
-  const formattedDate = article.publishedAt
-    ? new Date(article.publishedAt).toLocaleDateString("zh-CN", {
+  const formattedDate = article.createdAt
+    ? new Date(article.createdAt).toLocaleDateString("zh-CN", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -49,10 +36,7 @@ const PostCard = ({
         </div>
       )}
       <div className="p-5 flex flex-col flex-grow">
-        <Link
-          href={`/posts/${article.id}?lang=${lang}`}
-          className="hover:underline"
-        >
+        <Link href={`/posts/${article.id}`} className="hover:underline">
           <h3 className="text-xl font-bold mb-2">{translation.title}</h3>
           <p className="text-gray-600 mb-4 text-sm line-clamp-3">{excerpt}</p>
         </Link>
@@ -71,9 +55,6 @@ const PostCard = ({
             <span>{article.author || "未知作者"}</span>
             <div className="flex items-center gap-2">
               <span>{formattedDate || "未知日期"}</span>
-              <span className="px-2 py-0.5 bg-gray-200 rounded-full uppercase text-xs">
-                {lang}
-              </span>
             </div>
           </div>
         </div>

@@ -15,6 +15,7 @@ model Draft {
   data      Json // 可存储任意数据结构
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false) // 标记是否已删除
 }
 
 // 正式文章表
@@ -50,6 +51,7 @@ model ArticleTranslation {
   title       String
   summary     String?
   content     String
+  mediaFiles  String[] // 多媒体文件关联
   coverPrompt String?
   cover       String?
   categories  String[]

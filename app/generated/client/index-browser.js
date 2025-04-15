@@ -122,7 +122,8 @@ exports.Prisma.DraftScalarFieldEnum = {
   author: 'author',
   data: 'data',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  isDeleted: 'isDeleted'
 };
 
 exports.Prisma.ArticleScalarFieldEnum = {
@@ -143,6 +144,7 @@ exports.Prisma.ArticleTranslationScalarFieldEnum = {
   title: 'title',
   summary: 'summary',
   content: 'content',
+  mediaFiles: 'mediaFiles',
   coverPrompt: 'coverPrompt',
   cover: 'cover',
   categories: 'categories',
