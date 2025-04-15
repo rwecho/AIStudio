@@ -24,7 +24,7 @@ const formatAssets = (html: string) => {
       if (!url) {
         throw new Error("NEXT_PUBLIC_API_URL is not defined");
       }
-      return match.replace(src, src.replace("/redirect", ""));
+      return match.replace(src, url + src);
     }
     return match.replace(src, src.replace("/redirect", ""));
   });
@@ -169,7 +169,7 @@ export default function PublishToWechat({
   return (
     <div className="mt-3">
       {getStatusBadge()}
-      {!isAlreadyPublished && (
+      {!isAlreadyPublished && !error && !success && (
         <button
           onClick={handlePublish}
           disabled={loading}
