@@ -87,7 +87,15 @@ export const LoadMorePosts: React.FC<LoadMorePostsProps> = ({
       {articles.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
           {articles.map((article) => (
-            <PostCard key={article.id} article={article} lang={lang} />
+            <>
+              {article.translations.length > 0 && (
+                <PostCard
+                  key={article.id}
+                  article={article}
+                  translation={article.translations[0]}
+                />
+              )}
+            </>
           ))}
         </div>
       )}
