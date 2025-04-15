@@ -193,7 +193,7 @@ export default async function ArticlePage({
           )}
 
           {translation.categories.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-6">
+            <div className="hidden flex-wrap gap-2 mb-6 md:flex">
               {translation.categories.map((category, index) => (
                 <span
                   key={index}
@@ -205,7 +205,7 @@ export default async function ArticlePage({
             </div>
           )}
 
-          <div className="flex items-center text-gray-600 mb-8 text-sm">
+          <div className="hidden md:flex items-center text-gray-600 mb-8 text-sm">
             {article.author && (
               <span className="mr-4">作者: {article.author}</span>
             )}

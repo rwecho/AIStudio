@@ -3,15 +3,17 @@ import PostCard from "./components/Post";
 import { LoadMorePosts } from "./components/LoadMorePosts";
 import { generateArticleMetadata } from "./lib/metadata";
 import { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 
 // 设置页面为ISR模式，每10分钟重新生成一次
 export const revalidate = 600; // 单位为秒，10分钟 = 600秒
 
 // 首页的静态元数据
 export const metadata: Metadata = generateArticleMetadata({
-  title: "科技前沿 - 最新科技资讯",
+  title: "AIStudioX - 科技脉搏",
   description:
-    "科技前沿网站提供全球最新科技新闻、产品评测、深度解析。关注人工智能、区块链、元宇宙、Web3.0等前沿科技领域。",
+    "AIStudioX网站提供全球最新科技新闻、产品评测、深度解析。关注人工智能、区块链、元宇宙、Web3.0等前沿科技领域。",
   keywords: [
     "科技新闻",
     "科技资讯",
@@ -20,6 +22,10 @@ export const metadata: Metadata = generateArticleMetadata({
     "元宇宙",
     "Web3.0",
     "科技前沿",
+    "AIStudioX",
+    "AutoGen",
+    "AIStudio",
+    "TechPulse",
   ],
   type: "website",
 });
@@ -68,12 +74,63 @@ export default async function Home({
   const hasMore = count > top;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <header className="mb-10">
-        <h1 className="text-4xl font-bold text-center mb-2">科技前沿</h1>
-        <p className="text-xl text-gray-600 text-center">
-          最新科技资讯，尽在掌握
-        </p>
+    <div className="container mx-auto px-4 py-4">
+      {/* 新设计的 Header 和 Navbar */}
+      <header className="mb-8">
+        <div className="flex flex-col md:flex-row items-center justify-between py-4 border-b border-gray-200">
+          {/* Logo 部分 */}
+          <div className="flex items-center mb-4 md:mb-0">
+            <Image
+              src="/logo.jpg"
+              alt="AIStudioX Logo"
+              width={64}
+              height={64}
+              className="mr-3"
+            />
+            <div>
+              <h1 className="text-2xl font-bold">AIStudioX</h1>
+              <span className="text-sm text-gray-500">
+                <strong>
+                  {lang === "cn"
+                    ? "关注科技脉搏"
+                    : "Focus on cutting-edge technology"}
+                </strong>
+                {lang === "cn"
+                  ? "关注人工智能、区块链、元宇宙、Web3.0等前沿科技领域"
+                  : "Focus on cutting-edge technology in AI, blockchain, metaverse, and Web3.0"}
+              </span>
+            </div>
+          </div>
+
+          {/* 导航栏 */}
+          <nav className="flex flex-wrap justify-center md:justify-end space-x-6">
+            <Link
+              href="/"
+              className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
+            >
+              首页
+            </Link>
+            {/* <Link
+              href="/read"
+              className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
+            >
+              阅读
+            </Link> */}
+
+            <Link
+              href="/?lang=en"
+              className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
+            >
+              English
+            </Link>
+            <Link
+              href="/?lang=cn"
+              className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
+            >
+              中文
+            </Link>
+          </nav>
+        </div>
       </header>
 
       <section>
