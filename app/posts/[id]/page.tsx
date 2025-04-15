@@ -16,7 +16,6 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import Media from "@/app/components/Media";
 import PublishToWechat from "@/app/components/PublishToWechat";
-import { cookies } from "next/headers";
 
 // 设置页面重新验证时间，每小时重新验证一次
 export const revalidate = 6000; // 单位为秒，1小时 = 3600秒
@@ -42,12 +41,13 @@ export async function generateStaticParams() {
 // 生成文章页面的动态元数据
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: { [key: string]: string | string[] | undefined };
 }): Promise<Metadata> {
   const { id } = await params;
-  const cookieStore = await cookies();
-  const lang = cookieStore.get("lang")?.value || "cn"; // 默认中文
+  const lang = (searchParams.lang as string) || "cn"; // 默认中文
 
   const article = await prisma.article.findUnique({
     where: { id },
@@ -118,12 +118,13 @@ async function getArticle(id: string, lang: string) {
 
 export default async function ArticlePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
   // 获取当前语言或默认中文
-  const cookieStore = await cookies();
-  const lang = cookieStore.get("lang")?.value || "cn"; // 默认中文
+  const lang = (searchParams.lang as string) || "cn"; // 默认中文
 
   const article = await getArticle((await params).id, lang);
 
@@ -216,6 +217,21 @@ export default async function ArticlePage({
           {translation.summary && (
             <div className="bg-gray-50 p-4 rounded-lg mb-6 italic">
               {translation.summary}
+            </div>
+          )}
+
+          {translation.mediaFiles && translation.mediaFiles.length > 0 && (
+            <div className="flex flex-wrap gap-4 my-4">
+              {translation.mediaFiles.map((media, index) => (
+                <div key={index} className="w-full md:w-1/2 lg:w-1/3">
+                  <Media
+                    mediaUrl={`/api/oss?ossKey=${media}`}
+                    title={""}
+                    width={400}
+                    height={300}
+                  />
+                </div>
+              ))}
             </div>
           )}
 

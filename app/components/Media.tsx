@@ -7,9 +7,20 @@ import ImageModal from "./ImageModal";
 interface MediaProps {
   mediaUrl: string;
   title?: string;
+  width?: number;
+  height?: number;
+  objectFit?: string;
+  objectPosition?: string;
 }
 
-const Media: React.FC<MediaProps> = ({ mediaUrl, title }) => {
+const Media: React.FC<MediaProps> = ({
+  mediaUrl,
+  title,
+  width,
+  height,
+  objectFit = "cover",
+  objectPosition = "center",
+}) => {
   const [showImageModal, setShowImageModal] = useState(false);
 
   // 判断媒体类型
@@ -28,10 +39,15 @@ const Media: React.FC<MediaProps> = ({ mediaUrl, title }) => {
           >
             <Image
               src={mediaUrl}
+              lazyBoundary="200px"
               alt={title || "Image"}
-              fill
-              className="object-cover"
+              fill={width ? false : true}
+              className="w-full"
               priority={false}
+              width={width}
+              height={height}
+              objectPosition={objectPosition}
+              objectFit={objectFit}
             />
             <div className="absolute inset-0  hover:backdrop-blur-xs hover:bg-black/10 hover:bg-opacity-10 flex items-center justify-center transition-all duration-300">
               <span className="text-white opacity-0 hover:opacity-100 text-sm font-medium">

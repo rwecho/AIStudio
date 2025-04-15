@@ -5,9 +5,11 @@ import Media from "./Media";
 const PostCard = ({
   article,
   translation,
+  lang,
 }: {
   article: Article;
   translation: ArticleTranslation;
+  lang: string;
 }) => {
   // 获取发布日期的格式化显示
   const formattedDate = article.createdAt
@@ -32,11 +34,19 @@ const PostCard = ({
     <article className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
       {imageUrl && (
         <div className="relative h-48 w-full overflow-hidden">
-          <Media mediaUrl={imageUrl} title={translation.title} />
+          <Media
+            mediaUrl={imageUrl}
+            title={translation.title}
+            width={400}
+            height={300}
+          />
         </div>
       )}
       <div className="p-5 flex flex-col flex-grow">
-        <Link href={`/posts/${article.id}`} className="hover:underline">
+        <Link
+          href={`/posts/${article.id}?lang=${lang}`}
+          className="hover:underline"
+        >
           <h3 className="text-xl font-bold mb-2">{translation.title}</h3>
           <p className="text-gray-600 mb-4 text-sm line-clamp-3">{excerpt}</p>
         </Link>

@@ -1,7 +1,6 @@
 import { ArticleStatus, WechatPublishStatus } from "@/app/generated/client";
 import { deleteFromAliyun } from "@/app/services/aliyun";
 import prisma from "@/app/services/prisma";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 // 辅助函数：不区分大小写获取URL参数
@@ -40,10 +39,7 @@ export async function GET(request: Request) {
   const status = getParamCaseInsensitive(searchParams, "status");
   const author = getParamCaseInsensitive(searchParams, "author");
   const authors = getParamCaseInsensitive(searchParams, "authors");
-
-  const cookieStore = await cookies();
-  const lang = cookieStore.get("lang")?.value || "cn"; // 默认中文
-
+  const lang = getParamCaseInsensitive(searchParams, "lang") || "cn"; // 默认中文
   const wechatStatus = getParamCaseInsensitive(searchParams, "wechatStatus");
   const includeWechatPublish = getParamCaseInsensitive(
     searchParams,

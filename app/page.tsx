@@ -3,7 +3,6 @@ import PostCard from "./components/Post";
 import { LoadMorePosts } from "./components/LoadMorePosts";
 import { generateArticleMetadata } from "./lib/metadata";
 import { Metadata } from "next";
-import { cookies } from "next/headers";
 
 // 设置页面为ISR模式，每10分钟重新生成一次
 export const revalidate = 600; // 单位为秒，10分钟 = 600秒
@@ -25,9 +24,12 @@ export const metadata: Metadata = generateArticleMetadata({
   type: "website",
 });
 
-export default async function Home() {
-  const cookieStore = await cookies();
-  const lang = cookieStore.get("lang")?.value || "cn"; // 默认中文
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const lang = ((await searchParams).lang as string) || "cn"; // 默认中文
 
   // 服务器端获取文章数据
   const top = 50;
@@ -82,15 +84,15 @@ export default async function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {articles.map((article) => (
-              <>
+              <div key={article.id}>
                 {article.translations.length > 0 && (
                   <PostCard
-                    key={article.id}
                     article={article}
                     translation={article.translations[0]}
+                    lang={lang}
                   />
                 )}
-              </>
+              </div>
             ))}
           </div>
         )}
