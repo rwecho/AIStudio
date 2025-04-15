@@ -15,6 +15,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import Media from "@/app/components/Media";
 import PublishToWechat from "@/app/components/PublishToWechat";
+import { readableDate } from "@/app/services/dateutils";
 
 // 设置页面重新验证时间，每小时重新验证一次
 export const revalidate = 6000; // 单位为秒，1小时 = 3600秒
@@ -133,14 +134,6 @@ export default async function ArticlePage({
 
   const translation = article.translations[0];
 
-  const formattedDate = article.publishedAt
-    ? new Date(article.publishedAt).toLocaleDateString("zh-CN", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : null;
-
   // 获取文章的精简描述用于 JSON-LD
   const plainTextContent =
     translation.summary ||
@@ -202,9 +195,11 @@ export default async function ArticlePage({
             {article.author && (
               <span className="mr-4">作者: {article.author}</span>
             )}
-            {formattedDate && (
-              <span className="mr-4">发布于: {formattedDate}</span>
-            )}
+            {
+              <span className="mr-4">
+                发布于: {readableDate(article.createdAt)}
+              </span>
+            }
           </div>
 
           {translation.summary && (
