@@ -1,12 +1,30 @@
 import Link from "next/link";
-import { Post } from "../generated/client";
+import { Article, ArticleTranslation } from "../generated/client";
 import Media from "./Media";
 
-// 移除 FC 类型和 useState，使其成为服务器组件
-const PostCard = ({ post }: { post: Post }) => {
+interface ArticleWithTranslation extends Article {
+  translations?: ArticleTranslation[];
+}
+
+const PostCard = ({
+  article,
+  lang = "cn",
+}: {
+  article: ArticleWithTranslation;
+  lang?: string;
+}) => {
+  // 获取当前语言的翻译
+  const translation =
+    article.translations?.find((t) => t.lang === lang) ||
+    article.translations?.[0];
+
+  if (!translation) {
+    return null; // 如果没有翻译，不显示
+  }
+
   // 获取发布日期的格式化显示
-  const formattedDate = post.published
-    ? new Date(post.published).toLocaleDateString("zh-CN", {
+  const formattedDate = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString("zh-CN", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -14,43 +32,48 @@ const PostCard = ({ post }: { post: Post }) => {
     : null;
 
   // 提取内容摘要（限制在100个字符以内）
-  const excerpt = post.formattedContent
-    ? post.formattedContent.replace(/<[^>]*>?/gm, "").slice(0, 100) + "..."
-    : post.content.slice(0, 100) + "...";
+  const excerpt =
+    translation.summary ||
+    translation.content.replace(/<[^>]*>?/gm, "").slice(0, 100) + "...";
 
   // 获取图片URL
-  const imageUrl =
-    post.mediaFiles.length > 0 ? `/api/oss?ossKey=${post.mediaFiles[0]}` : null;
+  const imageUrl = translation.cover
+    ? `/api/oss?ossKey=${translation.cover}`
+    : null;
 
   return (
     <article className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
       {imageUrl && (
         <div className="relative h-48 w-full overflow-hidden">
-          {/* 使用新的 Media 组件处理多媒体展示 */}
-          <Media mediaUrl={imageUrl} title={post.title} />
+          <Media mediaUrl={imageUrl} title={translation.title} />
         </div>
       )}
-
       <div className="p-5 flex flex-col flex-grow">
-        <Link href={`/posts/${post.id}`} className="hover:underline">
+        <Link
+          href={`/posts/${article.id}?lang=${lang}`}
+          className="hover:underline"
+        >
+          <h3 className="text-xl font-bold mb-2">{translation.title}</h3>
           <p className="text-gray-600 mb-4 text-sm line-clamp-3">{excerpt}</p>
         </Link>
         <div className="mt-auto pt-4">
           <div className="flex flex-wrap gap-2 mb-3">
-            {post.tags.slice(0, 3).map((tag, index) => (
+            {translation.categories.slice(0, 3).map((category, index) => (
               <span
                 key={index}
                 className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
               >
-                {tag}
+                {category}
               </span>
             ))}
           </div>
-
           <div className="flex justify-between items-center text-sm text-gray-500">
-            <span>{post.source || "未知来源"}</span>
+            <span>{article.author || "未知作者"}</span>
             <div className="flex items-center gap-2">
               <span>{formattedDate || "未知日期"}</span>
+              <span className="px-2 py-0.5 bg-gray-200 rounded-full uppercase text-xs">
+                {lang}
+              </span>
             </div>
           </div>
         </div>

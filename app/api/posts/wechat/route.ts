@@ -6,46 +6,56 @@ export async function POST(request: NextRequest) {
   try {
     // 获取请求数据
     const input = await request.json();
-    const postId = input.postId || input.id; // 兼容两种格式的请求
-    
-    if (!postId) {
-      return NextResponse.json(
-        { error: "缺少必要的文章ID" },
-        { status: 400 }
-      );
+    const articleId = input.articleId || input.id; // 兼容两种格式的请求
+    const lang = input.lang || "cn"; // 默认使用中文内容发布
+
+    if (!articleId) {
+      return NextResponse.json({ error: "缺少必要的文章ID" }, { status: 400 });
     }
-    
-    // 检查文章是否存在
-    const post = await prisma.post.findUnique({
-      where: { id: postId },
-      include: { wechatPublish: true }
+
+    // 检查文章是否存在，并获取指定语言的翻译
+    const article = await prisma.article.findUnique({
+      where: { id: articleId },
+      include: {
+        translations: {
+          where: { lang },
+        },
+        wechatPublish: true,
+      },
     });
-    
-    if (!post) {
+
+    if (!article) {
+      return NextResponse.json({ error: "文章不存在" }, { status: 404 });
+    }
+
+    // 检查是否存在指定语言的翻译
+    if (!article.translations || article.translations.length === 0) {
       return NextResponse.json(
-        { error: "文章不存在" },
+        { error: `不存在${lang}语言的翻译内容` },
         { status: 404 }
       );
     }
-    
+
     // 检查是否已经存在发布记录
-    if (post.wechatPublish?.status === WechatPublishStatus.PUBLISHED) {
+    if (article.wechatPublish?.status === WechatPublishStatus.PUBLISHED) {
       return NextResponse.json(
         { error: "文章已发布到公众号" },
         { status: 400 }
       );
     }
 
-    // 处理内容，使用文章的格式化内容或原始内容
-    const content = post.formattedContent || post.content;
-    
-    console.log(`准备发布文章《${post.title}》到公众号，ID: ${postId}`);
-    
+    // 获取翻译内容
+    const translation = article.translations[0];
+    const content = translation.content;
+    const title = translation.title;
+
+    console.log(`准备发布文章《${title}》到公众号，ID: ${articleId}`);
+
     // 创建或更新发布记录
     const wechatPublish = await prisma.wechatPublish.upsert({
-      where: { postId: postId },
+      where: { articleId },
       create: {
-        postId: postId,
+        articleId,
         content: content,
         status: WechatPublishStatus.PENDING,
       },
@@ -56,11 +66,11 @@ export async function POST(request: NextRequest) {
         updatedAt: new Date(),
       },
     });
-    
+
     return NextResponse.json({
       success: true,
       message: "文章已加入公众号发布队列",
-      data: wechatPublish
+      data: wechatPublish,
     });
   } catch (error) {
     console.error("发布到公众号失败:", error);

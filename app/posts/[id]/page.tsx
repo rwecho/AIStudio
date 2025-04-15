@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "../../services/prisma";
-import { PostStatus, WechatPublishStatus } from "../../generated/client";
+import { ArticleStatus } from "../../generated/client";
 import {
   generateArticleJsonLd,
   generateArticleMetadata,
@@ -16,25 +16,26 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import Media from "@/app/components/Media";
 import PublishToWechat from "@/app/components/PublishToWechat";
+import { cookies } from "next/headers";
 
 // 设置页面重新验证时间，每小时重新验证一次
 export const revalidate = 6000; // 单位为秒，1小时 = 3600秒
 
 // 预生成前50篇文章的静态页面
 export async function generateStaticParams() {
-  const posts = await prisma.post.findMany({
+  const articles = await prisma.article.findMany({
     where: {
-      status: PostStatus.PUBLISHED,
+      status: ArticleStatus.PUBLISHED,
     },
     select: { id: true },
     orderBy: {
-      published: "desc",
+      publishedAt: "desc",
     },
     take: 50,
   });
 
-  return posts.map((post) => ({
-    id: post.id,
+  return articles.map((article) => ({
+    id: article.id,
   }));
 }
 
@@ -44,71 +45,96 @@ export async function generateMetadata({
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const post = await prisma.post.findUnique({
-    where: { id: (await params).id },
+  const { id } = await params;
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("lang")?.value || "cn"; // 默认中文
+
+  const article = await prisma.article.findUnique({
+    where: { id },
+    include: {
+      translations: {
+        where: { lang },
+      },
+    },
   });
 
-  if (!post) {
+  if (!article || !article.translations?.length) {
     return generateArticleMetadata({
       title: "文章未找到",
       description: "抱歉，您请求的文章不存在或已被移除。",
     });
   }
 
+  const translation = article.translations[0];
+
   // 从内容中提取纯文本用作描述
-  const plainTextContent = post.formattedContent
-    ? post.formattedContent.replace(/<[^>]*>?/gm, "").slice(0, 200) + "..."
-    : post.content.slice(0, 200) + "...";
+  const plainTextContent =
+    translation.summary ||
+    translation.content.replace(/<[^>]*>?/gm, "").slice(0, 200) + "...";
 
   // 构建文章的元数据
   return generateArticleMetadata({
-    title: post.title,
+    title: translation.title,
     description: plainTextContent,
-    keywords: post.tags,
+    keywords: translation.keywords,
     type: "article",
-    publishedTime: post.published?.toISOString(),
-    modifiedTime: post.updatedAt?.toISOString(),
-    authors: post.author ? [post.author] : undefined,
-    section: "科技",
-    image:
-      post.mediaFiles.length > 0
-        ? `/api/oss?ossKey=${post.mediaFiles[0]}`
-        : undefined,
-    canonicalUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/posts/${post.id}`,
+    publishedTime: article.publishedAt?.toISOString(),
+    modifiedTime: article.updatedAt?.toISOString(),
+    authors: article.author ? [article.author] : undefined,
+    section: translation.categories?.[0] || "科技",
+    image: translation.cover
+      ? `/api/oss?ossKey=${translation.cover}`
+      : undefined,
+    canonicalUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/posts/${article.id}?lang=${lang}`,
   });
 }
 
-async function getPost(id: string) {
-  const post = await prisma.post.findUnique({
+async function getArticle(id: string, lang: string) {
+  const article = await prisma.article.findUnique({
     where: { id },
+    include: {
+      translations: {
+        where: { lang },
+        include: {
+          references: true,
+        },
+      },
+      wechatPublish: true,
+    },
   });
 
-  if (!post) {
+  if (!article || !article.translations?.length) {
     return null;
   }
 
   // 增加文章阅读量
-  await prisma.post.update({
+  await prisma.article.update({
     where: { id },
     data: { views: { increment: 1 } },
   });
 
-  return post;
+  return article;
 }
 
-export default async function PostPage({
+export default async function ArticlePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const post = await getPost((await params).id);
+  // 获取当前语言或默认中文
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("lang")?.value || "cn"; // 默认中文
 
-  if (!post) {
+  const article = await getArticle((await params).id, lang);
+
+  if (!article) {
     notFound();
   }
 
-  const formattedDate = post.published
-    ? new Date(post.published).toLocaleDateString("zh-CN", {
+  const translation = article.translations[0];
+
+  const formattedDate = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString("zh-CN", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -116,23 +142,29 @@ export default async function PostPage({
     : null;
 
   // 获取文章的精简描述用于 JSON-LD
-  const plainTextContent = post.formattedContent
-    ? post.formattedContent.replace(/<[^>]*>?/gm, "").slice(0, 200) + "..."
-    : post.content.slice(0, 200) + "...";
+  const plainTextContent =
+    translation.summary ||
+    translation.content.replace(/<[^>]*>?/gm, "").slice(0, 200) + "...";
 
   // 生成文章的结构化数据
   const articleJsonLd = generateArticleJsonLd({
-    title: post.title,
+    title: translation.title,
     description: plainTextContent,
-    authorName: post.author || "科技前沿",
-    publishedTime: post.published?.toISOString(),
-    modifiedTime: post.updatedAt?.toISOString(),
-    image:
-      post.mediaFiles.length > 0
-        ? `/api/oss?ossKey=${post.mediaFiles[0]}`
-        : undefined,
-    url: `${process.env.NEXT_PUBLIC_SITE_URL}/posts/${post.id}`,
-    tags: post.tags,
+    authorName: article.author || "科技前沿",
+    publishedTime: article.publishedAt?.toISOString(),
+    modifiedTime: article.updatedAt?.toISOString(),
+    image: translation.cover
+      ? `/api/oss?ossKey=${translation.cover}`
+      : undefined,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL}/posts/${article.id}?lang=${lang}`,
+    tags: translation.keywords,
+  });
+
+  // 获取所有可用语言版本
+  const availableLanguages = await prisma.articleTranslation.findMany({
+    where: { articleId: article.id },
+    select: { lang: true },
+    orderBy: { lang: "asc" },
   });
 
   return (
@@ -140,63 +172,81 @@ export default async function PostPage({
       {/* 注入文章的结构化数据 */}
       <JsonLd data={articleJsonLd} />
 
-      <Link
-        href="/"
-        className="text-blue-500 hover:underline mb-6 inline-block"
-      >
-        &larr; 返回首页
-      </Link>
+      <div className="flex justify-between items-center mb-6">
+        <Link href="/" className="text-blue-500 hover:underline inline-block">
+          &larr; 返回首页
+        </Link>
+
+        {/* 语言切换 */}
+        {availableLanguages.length > 1 && (
+          <div className="flex gap-2">
+            {availableLanguages.map((langOption) => (
+              <Link
+                key={langOption.lang}
+                href={`/posts/${article.id}?lang=${langOption.lang}`}
+                className={`px-2 py-1 rounded ${
+                  langOption.lang === lang
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
+              >
+                {langOption.lang.toUpperCase()}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
 
       <article
         className="bg-white rounded-lg shadow-md overflow-hidden"
-        id={`article-${post.id}`}
+        id={`article-${article.id}`}
       >
-        {post.mediaFiles.length > 0 && (
+        {translation.cover && (
           <div className="relative w-full h-[400px]">
             <Media
-              mediaUrl={`/api/oss?ossKey=${post.mediaFiles[0]}`}
-              title={post.title}
+              mediaUrl={`/api/oss?ossKey=${translation.cover}`}
+              title={translation.title}
             />
           </div>
         )}
 
-        {post.mediaFiles.length > 1 && (
-          <div className="flex flex-wrap gap-4 p-6">
-            {post.mediaFiles.slice(1).map((mediaFile, index) => (
-              <div key={index} className="w-1/3 aspect-video relative">
-                <Media
-                  mediaUrl={`/api/oss?ossKey=${mediaFile}`}
-                  title={post.title}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-
         <div className="p-6 md:p-8">
-          {post.title && (
+          {translation.title && (
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
-              {post.title}
+              {translation.title}
             </h1>
           )}
-          {post.tags.length > 0 && (
+
+          {translation.categories.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-6">
-              {post.tags.map((tag, index) => (
+              {translation.categories.map((category, index) => (
                 <span
                   key={index}
                   className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
                 >
-                  {tag}
+                  {category}
                 </span>
               ))}
             </div>
           )}
 
           <div className="flex items-center text-gray-600 mb-8 text-sm">
-            {post.author && <span className="mr-4">作者: {post.author}</span>}
-            {post.source && <span className="mr-4">来源: {post.source}</span>}
-            {formattedDate && <span>发布于: {formattedDate}</span>}
+            {article.author && (
+              <span className="mr-4">作者: {article.author}</span>
+            )}
+            {formattedDate && (
+              <span className="mr-4">发布于: {formattedDate}</span>
+            )}
+            <span className="px-2 py-0.5 bg-gray-200 rounded-full uppercase">
+              {lang}
+            </span>
           </div>
+
+          {translation.summary && (
+            <div className="bg-gray-50 p-4 rounded-lg mb-6 italic">
+              {translation.summary}
+            </div>
+          )}
 
           <div className="prose prose-lg max-w-none">
             <ReactMarkdown
@@ -222,56 +272,47 @@ export default async function PostPage({
                 },
               }}
             >
-              {post.formattedContent || post.content}
+              {translation.content}
             </ReactMarkdown>
           </div>
+
+          {/* 参考资料 */}
+          {translation.references && translation.references.length > 0 && (
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <h3 className="text-xl font-bold mb-4">参考资料</h3>
+              <ul className="list-disc pl-5 space-y-2">
+                {translation.references.map((ref, index) => (
+                  <li key={index}>
+                    {ref.caption}:
+                    <a
+                      href={ref.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline ml-1"
+                    >
+                      {ref.url}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </article>
+
       {/* 分割线 */}
       <div className="border-t border-gray-200 my-8" />
 
       {/* 文章底部操作按钮 */}
       <div className="flex flex-row items-start justify-between mt-8">
-        {post.link && (
-          <div className="">
-            <p className="text-gray-600">原文链接：</p>
-            <a
-              href={post.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline break-all"
-            >
-              {post.link}
-            </a>
-          </div>
-        )}
-
         {/* 添加发布到公众号按钮，传递完整的文章对象 */}
         <PublishToWechat
-          post={post}
-          isAlreadyPublished={
-            !!(
-              post as unknown as {
-                wechatPublish: {
-                  status: string;
-                  createdAt: string;
-                };
-              }
-            ).wechatPublish
-          }
-          publishStatus={
-            (
-              post as unknown as {
-                wechatPublish: {
-                  status: WechatPublishStatus;
-                };
-              }
-            ).wechatPublish?.status || null
-          }
+          article={article}
+          lang={lang}
+          isAlreadyPublished={!!article.wechatPublish}
+          publishStatus={article.wechatPublish?.status || null}
         />
       </div>
-
-      {JSON.stringify(post)}
     </div>
   );
 }

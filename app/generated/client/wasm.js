@@ -117,34 +117,50 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.PostScalarFieldEnum = {
+exports.Prisma.DraftScalarFieldEnum = {
   id: 'id',
-  title: 'title',
-  content: 'content',
-  formattedTitle: 'formattedTitle',
-  formattedContent: 'formattedContent',
-  link: 'link',
-  published: 'published',
   author: 'author',
-  source: 'source',
+  data: 'data',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ArticleScalarFieldEnum = {
+  id: 'id',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  views: 'views',
-  likes: 'likes',
-  tags: 'tags',
-  keywords: 'keywords',
-  sourceUrls: 'sourceUrls',
+  publishedAt: 'publishedAt',
+  author: 'author',
   status: 'status',
-  isApproved: 'isApproved',
-  isCleaned: 'isCleaned',
-  hasCoverImage: 'hasCoverImage',
-  coverImage: 'coverImage',
-  mediaFiles: 'mediaFiles'
+  views: 'views',
+  likes: 'likes'
+};
+
+exports.Prisma.ArticleTranslationScalarFieldEnum = {
+  id: 'id',
+  articleId: 'articleId',
+  lang: 'lang',
+  title: 'title',
+  summary: 'summary',
+  content: 'content',
+  coverPrompt: 'coverPrompt',
+  cover: 'cover',
+  categories: 'categories',
+  keywords: 'keywords',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ReferenceScalarFieldEnum = {
+  id: 'id',
+  articleTranslationId: 'articleTranslationId',
+  caption: 'caption',
+  url: 'url'
 };
 
 exports.Prisma.WechatPublishScalarFieldEnum = {
   id: 'id',
-  postId: 'postId',
+  articleId: 'articleId',
   status: 'status',
   content: 'content',
   error: 'error',
@@ -156,7 +172,7 @@ exports.Prisma.WechatPublishScalarFieldEnum = {
 
 exports.Prisma.CommentScalarFieldEnum = {
   id: 'id',
-  postId: 'postId',
+  articleId: 'articleId',
   content: 'content',
   author: 'author',
   createdAt: 'createdAt',
@@ -168,16 +184,26 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-exports.PostStatus = exports.$Enums.PostStatus = {
+exports.ArticleStatus = exports.$Enums.ArticleStatus = {
   DRAFT: 'DRAFT',
   PENDING: 'PENDING',
   PUBLISHED: 'PUBLISHED',
@@ -192,7 +218,10 @@ exports.WechatPublishStatus = exports.$Enums.WechatPublishStatus = {
 };
 
 exports.Prisma.ModelName = {
-  Post: 'Post',
+  Draft: 'Draft',
+  Article: 'Article',
+  ArticleTranslation: 'ArticleTranslation',
+  Reference: 'Reference',
   WechatPublish: 'WechatPublish',
   Comment: 'Comment'
 };

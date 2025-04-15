@@ -1,10 +1,14 @@
 "use client";
-
 import { useState } from "react";
-import { Post, WechatPublishStatus } from "../generated/client";
+import {
+  Article,
+  ArticleTranslation,
+  WechatPublishStatus,
+} from "../generated/client";
 
 interface PublishToWechatProps {
-  post: Post;
+  article: Article & { translations: ArticleTranslation[] };
+  lang: string;
   isAlreadyPublished?: boolean;
   publishStatus?: WechatPublishStatus | null;
 }
@@ -13,7 +17,6 @@ const formatAssets = (html: string) => {
   // 找到 html 里面的图片、视频和音乐，在url前面增加代理地址
   const regex =
     /<img[^>]+src="([^">]+)"|<video[^>]+src="([^">]+)"|<audio[^>]+src="([^">]+)"/g;
-
   html = html.replace(regex, (match, imgSrc, videoSrc, audioSrc) => {
     const src = imgSrc || videoSrc || audioSrc;
     if (!src.startsWith("http")) {
@@ -25,9 +28,9 @@ const formatAssets = (html: string) => {
     }
     return match.replace(src, src.replace("/redirect", ""));
   });
-
   return html;
 };
+
 const getCardInnerHtml = (cardId: string) => {
   const card = document.getElementById(cardId);
   if (!card) return [null, null];
@@ -61,7 +64,6 @@ const getCardInnerHtml = (cardId: string) => {
   });
 
   const formattedHtml = formatAssets(card.innerHTML);
-
   const content = `
       <html>
         <head>
@@ -72,18 +74,25 @@ const getCardInnerHtml = (cardId: string) => {
         </body>
       </html>
     `;
-
   return [content, card.innerText];
 };
 
 export default function PublishToWechat({
-  post,
+  article,
+  lang,
   isAlreadyPublished = false,
   publishStatus = null,
 }: PublishToWechatProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  // 获取当前语言的翻译
+  const translation = article.translations.find((t) => t.lang === lang);
+
+  if (!translation) {
+    return null; // 如果没有翻译，不显示按钮
+  }
 
   // 根据发布状态返回相应的状态标签
   const getStatusBadge = () => {
@@ -115,9 +124,8 @@ export default function PublishToWechat({
 
   // 处理提交发布请求
   const handlePublish = async () => {
-    const cardId = `article-${post.id}`;
+    const cardId = `article-${article.id}`;
     const [content] = getCardInnerHtml(cardId);
-
     console.log("发布内容:", content);
 
     // 如果已经发布或者正在加载，则不处理
@@ -128,10 +136,9 @@ export default function PublishToWechat({
     setSuccess(false);
 
     try {
-      const cover =
-        post.mediaFiles.length > 0
-          ? `${process.env.NEXT_PUBLIC_API_URL}/api/oss?ossKey=${post.mediaFiles[0]}`
-          : "";
+      const cover = translation.cover
+        ? `${process.env.NEXT_PUBLIC_API_URL}/api/oss?ossKey=${translation.cover}`
+        : "";
 
       const response = await fetch("/api/posts/wechat", {
         method: "POST",
@@ -139,19 +146,20 @@ export default function PublishToWechat({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: post.id,
-          title: post.title,
+          id: article.id,
+          lang: lang,
+          title: translation.title,
           content: content,
           cover: cover,
-          source: post.source || "",
+          author: article.author || "",
         }),
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.error || "发布请求失败");
       }
+
       setSuccess(true);
     } catch (err: any) {
       setError(err.message || "发布过程中出现错误");
@@ -164,7 +172,6 @@ export default function PublishToWechat({
   return (
     <div className="mt-3">
       {getStatusBadge()}
-
       {!isAlreadyPublished && (
         <button
           onClick={handlePublish}
@@ -200,9 +207,7 @@ export default function PublishToWechat({
           )}
         </button>
       )}
-
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
-
       {success && (
         <p className="mt-2 text-xs text-green-600">
           已添加到发布队列，请稍后查看

@@ -3,31 +3,34 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // 使用Prisma的findMany和distinct来获取不重复的source值
-    const sources = await prisma.post.findMany({
+    // 使用Prisma的findMany和distinct来获取不重复的author值
+    const authors = await prisma.article.findMany({
       select: {
-        source: true,
+        author: true,
       },
       where: {
-        source: {
+        author: {
           not: null,
         },
       },
-      distinct: ["source"],
+      distinct: ["author"],
       orderBy: {
-        source: "asc",
+        author: "asc",
       },
     });
 
-    // 提取source字段值并过滤掉空值
-    const sourceList = sources.map((item) => item.source).filter(Boolean);
+    // 提取author字段值并过滤掉空值
+    const authorList = authors.map((item) => item.author).filter(Boolean);
 
     return NextResponse.json({
-      sources: sourceList,
-      total: sourceList.length,
+      authors: authorList,
+      total: authorList.length,
     });
   } catch (error) {
-    console.error("获取来源列表失败:", error);
-    return NextResponse.json({ error: "获取来源列表失败" }, { status: 500 });
+    console.error("获取作者/来源列表失败:", error);
+    return NextResponse.json(
+      { error: "获取作者/来源列表失败" },
+      { status: 500 }
+    );
   }
 }
