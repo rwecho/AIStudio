@@ -122,65 +122,6 @@ export async function POST(request: Request) {
   }
 }
 
-// 将草稿转换为文章
-export async function PATCH(request: Request) {
-  try {
-    const { id, lang = "cn" } = await request.json();
-
-    if (!id) {
-      return NextResponse.json({ error: "必须提供草稿ID" }, { status: 400 });
-    }
-
-    // 查找草稿
-    const draft = await prisma.draft.findUnique({
-      where: { id },
-    });
-
-    if (!draft) {
-      return NextResponse.json({ error: "草稿不存在" }, { status: 404 });
-    }
-
-    // 从草稿数据中提取需要的字段
-    const draftData = draft.data as any;
-
-    // 创建新文章及其翻译内容
-    const article = await prisma.article.create({
-      data: {
-        author: draft.author || "",
-        status: "DRAFT", // 默认为草稿状态
-        translations: {
-          create: [
-            {
-              lang,
-              title: draftData.title || "",
-              content: draftData.content || "",
-              summary: draftData.summary || "",
-              coverPrompt: draftData.coverPrompt || "",
-              cover: draftData.cover || "",
-              categories: draftData.categories || [],
-              keywords: draftData.keywords || [],
-            },
-          ],
-        },
-      },
-      include: {
-        translations: true,
-      },
-    });
-
-    // 可选：删除已转换的草稿
-    // await prisma.draft.delete({ where: { id } });
-
-    return NextResponse.json({
-      message: "草稿已成功转换为文章",
-      article,
-    });
-  } catch (error) {
-    console.error("转换草稿失败:", error);
-    return NextResponse.json({ error: "转换草稿失败" }, { status: 500 });
-  }
-}
-
 // 删除草稿
 export async function DELETE(request: Request) {
   try {
