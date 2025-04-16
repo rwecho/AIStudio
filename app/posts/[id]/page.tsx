@@ -150,7 +150,7 @@ export default async function ArticlePage({
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4  pb-8">
       {/* 注入文章的结构化数据 */}
       <JsonLd data={articleJsonLd} />
 
