@@ -3,8 +3,6 @@ import PostCard from "./components/Post";
 import { LoadMorePosts } from "./components/LoadMorePosts";
 import { generateArticleMetadata } from "./lib/metadata";
 import { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 
 // 设置页面为ISR模式，每10分钟重新生成一次
 export const revalidate = 600; // 单位为秒，10分钟 = 600秒
@@ -74,93 +72,29 @@ export default async function Home({
   const hasMore = count > top;
 
   return (
-    <div className="container mx-auto px-4 py-0">
-      {/* 新设计的 Header 和 Navbar */}
-      <header className="mb-8">
-        <div className="flex flex-col md:flex-row items-center justify-between py-4 border-b border-gray-200">
-          {/* Logo 部分 */}
-          <div className="flex items-center mb-4 md:mb-0">
-            <Image
-              src="/logo.jpg"
-              alt="AIStudioX Logo"
-              width={64}
-              height={64}
-              className="mr-3"
-            />
-            <div>
-              <h1 className="text-2xl font-bold">AIStudioX</h1>
-              <span className="text-sm text-gray-500">
-                <strong>
-                  {lang === "cn"
-                    ? "关注科技脉搏"
-                    : "Focus on cutting-edge technology"}
-                </strong>
-                {lang === "cn"
-                  ? "关注人工智能、区块链、元宇宙、Web3.0等前沿科技领域"
-                  : "Focus on cutting-edge technology in AI, blockchain, metaverse, and Web3.0"}
-              </span>
-            </div>
-          </div>
-
-          {/* 导航栏 */}
-          <nav className="flex flex-wrap justify-center md:justify-end space-x-6">
-            <Link
-              href="/"
-              className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
-            >
-              首页
-            </Link>
-            {/* <Link
-              href="/read"
-              className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
-            >
-              阅读
-            </Link> */}
-
-            <Link
-              href="/?lang=en"
-              className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
-            >
-              English
-            </Link>
-            <Link
-              href="/?lang=cn"
-              className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
-            >
-              中文
-            </Link>
-          </nav>
+    <section>
+      {articles.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="text-xl text-gray-600">暂无文章</p>
         </div>
-      </header>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {articles.map((article) => (
+            <div key={article.id}>
+              {article.translations.length > 0 && (
+                <PostCard
+                  article={article}
+                  translation={article.translations[0]}
+                  lang={lang}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
-      <section>
-        {articles.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-xl text-gray-600">暂无文章</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {articles.map((article) => (
-              <div key={article.id}>
-                {article.translations.length > 0 && (
-                  <PostCard
-                    article={article}
-                    translation={article.translations[0]}
-                    lang={lang}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* 加载更多组件，传入当前语言参数 */}
-        <LoadMorePosts
-          initialArticles={articles}
-          hasMore={hasMore}
-          lang={lang}
-        />
-      </section>
-    </div>
+      {/* 加载更多组件，传入当前语言参数 */}
+      <LoadMorePosts initialArticles={articles} hasMore={hasMore} lang={lang} />
+    </section>
   );
 }
