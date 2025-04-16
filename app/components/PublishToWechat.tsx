@@ -14,19 +14,24 @@ interface PublishToWechatProps {
 }
 
 const formatAssets = (html: string) => {
+  // 替换 /_next/image?url= 地址，在前面加上代理地址
+  debugger;
+  const url = process.env.NEXT_PUBLIC_API_URL;
+  if (!url) {
+    throw new Error("NEXT_PUBLIC_API_URL is not defined");
+  }
+  const nextImageRegex = /\/_next\/image\?url=/g;
+  html = html.replaceAll(nextImageRegex, url + "/_next/image?url=");
+
   // 找到 html 里面的图片、视频和音乐，在url前面增加代理地址
   const regex =
     /<img[^>]+src="([^">]+)"|<video[^>]+src="([^">]+)"|<audio[^>]+src="([^">]+)"/g;
   html = html.replace(regex, (match, imgSrc, videoSrc, audioSrc) => {
     const src = imgSrc || videoSrc || audioSrc;
     if (!src.startsWith("http")) {
-      const url = process.env.NEXT_PUBLIC_API_URL;
-      if (!url) {
-        throw new Error("NEXT_PUBLIC_API_URL is not defined");
-      }
-      return match.replace(src, url + src);
+      return match.replaceAll(src, url + src);
     }
-    return match.replace(src, src.replace("/redirect", ""));
+    return match.replaceAll(src, src.replace("/redirect", ""));
   });
   return html;
 };
@@ -124,6 +129,7 @@ export default function PublishToWechat({
 
   // 处理提交发布请求
   const handlePublish = async () => {
+    debugger;
     const cardId = `article-${article.id}`;
     const [content] = getCardInnerHtml(cardId);
     console.log("发布内容:", content);
