@@ -2,10 +2,13 @@ import prisma from "@/app/services/prisma";
 import { NextResponse } from "next/server";
 
 // 删除草稿
-export async function DELETE(request: Request) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const url = new URL(request.url);
-    const id = url.searchParams.get("id");
+    debugger;
+    const id = (await params).id;
 
     if (!id) {
       return NextResponse.json({ error: "必须提供草稿ID" }, { status: 400 });
