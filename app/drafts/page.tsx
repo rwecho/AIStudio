@@ -2,6 +2,8 @@ import React from "react";
 import prisma from "../services/prisma";
 import { readableDate } from "../services/dateutils";
 
+export const dynamic = "force-dynamic"; // 强制页面动态渲染
+
 export default async function DraftsPage() {
   // 服务器端获取文章数据
   const top = 50;
