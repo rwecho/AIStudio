@@ -39,7 +39,7 @@ export default async function RootLayout({
                     <h1 className="text-2xl font-bold">AIStudioX</h1>
                     <span className="text-sm text-gray-500">
                       <strong className="mr-2">关注科技脉搏</strong>
-                      关注人工智能、区块链、元宇宙、Web3.0等前沿科技领域
+                      关注人工智能、LLM、ChatGPT、AI绘画等前沿科技
                     </span>
                   </div>
                 </div>
