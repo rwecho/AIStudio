@@ -7,7 +7,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    debugger;
     const id = (await params).id;
 
     if (!id) {
@@ -24,10 +23,12 @@ export async function DELETE(
     }
 
     // 删除草稿
-    await prisma.draft.delete({
+    await prisma.draft.update({
       where: { id },
+      data: {
+        isDeleted: true,
+      },
     });
-
     return NextResponse.json({ success: true, message: "草稿已成功删除" });
   } catch (error) {
     console.error("删除草稿失败:", error);
