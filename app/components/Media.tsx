@@ -50,9 +50,7 @@ const Media: React.FC<MediaProps> = ({
               objectFit={objectFit}
             />
             <div className="absolute inset-0  hover:backdrop-blur-xs hover:bg-black/10 hover:bg-opacity-10 flex items-center justify-center transition-all duration-300">
-              <span className="text-white opacity-0 hover:opacity-100 text-sm font-medium">
-                点击查看大图
-              </span>
+              <span className="text-white opacity-0 hover:opacity-100 text-sm font-medium"></span>
             </div>
           </div>
 

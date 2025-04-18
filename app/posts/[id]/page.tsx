@@ -154,10 +154,7 @@ export default async function ArticlePage({
       {/* 注入文章的结构化数据 */}
       <JsonLd data={articleJsonLd} />
 
-      <article
-        className="bg-white rounded-lg shadow-md overflow-hidden"
-        id={`article-${article.id}`}
-      >
+      <article className="bg-white rounded-lg shadow-md overflow-hidden">
         {translation.cover && (
           <div className="relative w-full h-[400px]">
             <Media
@@ -173,7 +170,6 @@ export default async function ArticlePage({
               {translation.title}
             </h1>
           )}
-
           {translation.categories.length > 0 && (
             <div className="hidden flex-wrap gap-2 mb-6 md:flex">
               {translation.categories.map((category, index) => (
@@ -186,7 +182,6 @@ export default async function ArticlePage({
               ))}
             </div>
           )}
-
           <div className="hidden md:flex items-center text-gray-600 mb-8 text-sm">
             {article.author && (
               <span className="mr-4">作者: {article.author}</span>
@@ -197,56 +192,65 @@ export default async function ArticlePage({
               </span>
             }
           </div>
+          <div id={`article-${article.id}`}>
+            {translation.summary && (
+              <div className="bg-gray-50 p-4 rounded-lg mb-6 italic">
+                {translation.summary}
+              </div>
+            )}
 
-          {translation.summary && (
-            <div className="bg-gray-50 p-4 rounded-lg mb-6 italic">
-              {translation.summary}
+            {!translation.mediaFiles?.length && translation.cover && (
+              <div className="relative w-full h-[400px] mb-4">
+                <Media
+                  mediaUrl={`/api/oss?ossKey=${translation.cover}`}
+                  title={translation.title}
+                />
+              </div>
+            )}
+
+            {translation.mediaFiles && translation.mediaFiles.length > 0 && (
+              <div className="flex flex-wrap gap-4 my-4">
+                {translation.mediaFiles.map((media, index) => (
+                  <div key={index} className="w-full md:w-1/2 lg:w-1/3">
+                    <Media
+                      mediaUrl={`/api/oss?ossKey=${media}`}
+                      title={""}
+                      width={400}
+                      height={300}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="prose prose-lg max-w-none">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw, rehypeSanitize]}
+                components={{
+                  code({ className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || "");
+                    return match ? (
+                      <SyntaxHighlighter
+                        {...(props as any)}
+                        language={match[1]}
+                        PreTag="div"
+                        style={vscDarkPlus}
+                      >
+                        {String(children).replace(/\n$/, "")}
+                      </SyntaxHighlighter>
+                    ) : (
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    );
+                  },
+                }}
+              >
+                {translation.content}
+              </ReactMarkdown>
             </div>
-          )}
-
-          {translation.mediaFiles && translation.mediaFiles.length > 0 && (
-            <div className="flex flex-wrap gap-4 my-4">
-              {translation.mediaFiles.map((media, index) => (
-                <div key={index} className="w-full md:w-1/2 lg:w-1/3">
-                  <Media
-                    mediaUrl={`/api/oss?ossKey=${media}`}
-                    title={""}
-                    width={400}
-                    height={300}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="prose prose-lg max-w-none">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeRaw, rehypeSanitize]}
-              components={{
-                code({ className, children, ...props }) {
-                  const match = /language-(\w+)/.exec(className || "");
-                  return match ? (
-                    <SyntaxHighlighter
-                      {...(props as any)}
-                      language={match[1]}
-                      PreTag="div"
-                      style={vscDarkPlus}
-                    >
-                      {String(children).replace(/\n$/, "")}
-                    </SyntaxHighlighter>
-                  ) : (
-                    <code className={className} {...props}>
-                      {children}
-                    </code>
-                  );
-                },
-              }}
-            >
-              {translation.content}
-            </ReactMarkdown>
           </div>
-
           {/* 参考资料 */}
           {translation.references && translation.references.length > 0 && (
             <div className="mt-8 pt-6 border-t border-gray-200">
