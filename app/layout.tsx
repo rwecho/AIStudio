@@ -53,6 +53,12 @@ export default async function RootLayout({
                 >
                   首页
                 </Link>
+                <Link
+                  href="https://hot.aistudiox.com"
+                  className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
+                >
+                  热门新闻
+                </Link>
                 {/* <Link
               href="/read"
               className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
@@ -60,7 +66,7 @@ export default async function RootLayout({
               阅读
             </Link> */}
 
-                <Link
+                {/* <Link
                   href="/?lang=en"
                   className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
                 >
@@ -71,7 +77,7 @@ export default async function RootLayout({
                   className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
                 >
                   中文
-                </Link>
+                </Link> */}
               </nav>
             </div>
           </header>
