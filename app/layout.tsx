@@ -54,7 +54,7 @@ export default async function RootLayout({
                   首页
                 </Link>
                 <Link
-                  href="https://hot.aistudiox.com"
+                  href="https://hot.aistudiox.design"
                   className="font-medium text-gray-800 hover:text-blue-600 transition duration-150"
                 >
                   热门新闻
