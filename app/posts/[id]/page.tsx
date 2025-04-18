@@ -17,7 +17,7 @@ import PublishToWechat from "@/app/components/PublishToWechat";
 import { readableDate } from "@/app/services/dateutils";
 
 // 设置页面重新验证时间，每小时重新验证一次
-export const revalidate = 6000; // 单位为秒，1小时 = 3600秒
+export const revalidate = 3600; // 单位为秒，1小时 = 3600秒
 
 // 预生成前50篇文章的静态页面
 export async function generateStaticParams() {
@@ -155,15 +155,6 @@ export default async function ArticlePage({
       <JsonLd data={articleJsonLd} />
 
       <article className="bg-white rounded-lg shadow-md overflow-hidden">
-        {translation.cover && (
-          <div className="relative w-full h-[400px]">
-            <Media
-              mediaUrl={`/api/oss?ossKey=${translation.cover}`}
-              title={translation.title}
-            />
-          </div>
-        )}
-
         <div className="p-6 md:p-8">
           {translation.title && (
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
