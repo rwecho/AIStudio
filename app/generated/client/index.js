@@ -239,11 +239,12 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://echo:echo2024@129.150.32.85:45432/aistudiox?schema=public"
+        "value": null
       }
     }
   },

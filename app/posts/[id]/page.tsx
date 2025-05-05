@@ -15,19 +15,34 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import Media from "@/app/components/Media";
 import PublishToWechat from "@/app/components/PublishToWechat";
 import { readableDate } from "@/app/services/dateutils";
+import { cache } from "react";
 
 // 设置页面重新验证时间，每小时重新验证一次
 export const revalidate = 3600; // 单位为秒，1小时 = 3600秒
 
-// 预生成前50篇文章的静态页面
-export async function generateStaticParams() {
-  const articles = await prisma.article.findMany({
+const getTop50Articles = cache(async () => {
+  return await prisma.article.findMany({
     select: { id: true },
     orderBy: {
       publishedAt: "desc",
     },
     take: 50,
   });
+});
+
+const getArticleById = cache(async (id: string) => {
+  return await prisma.article.findUnique({
+    where: { id },
+    include: {
+      translations: true,
+      wechatPublish: true,
+    },
+  });
+});
+
+// 预生成前50篇文章的静态页面
+export async function generateStaticParams() {
+  const articles = await getTop50Articles();
 
   return articles.map((article) => ({
     id: article.id,
@@ -45,14 +60,7 @@ export async function generateMetadata({
   const { id } = await params;
   const lang = ((await searchParams).lang as string) || "cn"; // 默认中文
 
-  const article = await prisma.article.findUnique({
-    where: { id },
-    include: {
-      translations: {
-        where: { lang },
-      },
-    },
-  });
+  const article = await getArticleById(id);
 
   if (!article || !article.translations?.length) {
     return generateArticleMetadata({
@@ -85,7 +93,7 @@ export async function generateMetadata({
   });
 }
 
-async function getArticle(id: string, lang: string) {
+const getArticle = cache(async (id: string, lang: string) => {
   const article = await prisma.article.findUnique({
     where: { id },
     include: {
@@ -110,7 +118,7 @@ async function getArticle(id: string, lang: string) {
   });
 
   return article;
-}
+});
 
 export default async function ArticlePage({
   params,
@@ -121,8 +129,10 @@ export default async function ArticlePage({
 }) {
   // 获取当前语言或默认中文
   const lang = ((await searchParams).lang as string) || "cn"; // 默认中文
+  console.log("Datetime start:", new Date().toISOString());
 
   const article = await getArticle((await params).id, lang);
+  console.log("Datetime end:", new Date().toISOString());
 
   if (!article) {
     notFound();
