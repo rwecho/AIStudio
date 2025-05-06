@@ -32,13 +32,13 @@ export const LoadMorePosts: React.FC<LoadMorePostsProps> = ({
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/posts?page=${page + 1}&pageSize=12&lang=${lang}`
+        `/api/posts?page=${page + 1}&pageSize=50&lang=${lang}`
       );
       const data = await res.json();
-      if (data.articles.length === 0 || !data.hasMore) {
+      if (data.items.length === 0 || !data.hasMore) {
         setHasMore(false);
       }
-      setArticles((prevArticles) => [...prevArticles, ...data.articles]);
+      setArticles((prevArticles) => [...prevArticles, ...data.items]);
       setPage((prevPage) => prevPage + 1);
     } catch (error) {
       console.error("加载更多文章失败:", error);
