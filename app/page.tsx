@@ -3,10 +3,9 @@ import PostCard from "./components/Post";
 import { LoadMorePosts } from "./components/LoadMorePosts";
 import { generateArticleMetadata } from "./lib/metadata";
 import { Metadata } from "next";
-import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
-// 设置页面为ISR模式，每10分钟重新生成一次
-export const revalidate = 300; // 单位为秒，5分钟 = 300秒
+export const revalidate = 180;
 
 // 首页的静态元数据
 export const metadata: Metadata = generateArticleMetadata({
@@ -29,40 +28,56 @@ export const metadata: Metadata = generateArticleMetadata({
   type: "website",
 });
 
-const getTop50Articles = cache(async (lang: string) => {
-  return await prisma.article.findMany({
-    where: {
-      // status: "PUBLISHED", // 只获取已发布的文章
-      translations: {
-        some: {
-          lang, // 筛选指定语言的翻译
+const getTop50Articles = unstable_cache(
+  async (lang: string) => {
+    console.log("Fetching top 50 articles...");
+    return await prisma.article.findMany({
+      where: {
+        // status: "PUBLISHED", // 只获取已发布的文章
+        translations: {
+          some: {
+            lang, // 筛选指定语言的翻译
+          },
         },
       },
-    },
-    include: {
-      translations: {
-        where: { lang }, // 只获取当前语言的翻译
+      include: {
+        translations: {
+          where: { lang }, // 只获取当前语言的翻译
+        },
       },
-    },
-    take: 50, // 默认获取50条
-    orderBy: {
-      createdAt: "desc", // 按发布时间倒序
-    },
-  });
-});
+      take: 50, // 默认获取50条
+      orderBy: {
+        createdAt: "desc", // 按发布时间倒序
+      },
+    });
+  },
+  ["top50Articles"],
+  {
+    revalidate: 180,
+    tags: ["top50Articles"], // 关联的标签
+  }
+);
 
-const getCount = cache(async (lang: string) => {
-  return await prisma.article.count({
-    where: {
-      // status: "PUBLISHED", // 只获取已发布的文章
-      translations: {
-        some: {
-          lang, // 筛选指定语言的翻译
+const getCount = unstable_cache(
+  async (lang: string) => {
+    console.log("Fetching article count...");
+    return await prisma.article.count({
+      where: {
+        // status: "PUBLISHED", // 只获取已发布的文章
+        translations: {
+          some: {
+            lang, // 筛选指定语言的翻译
+          },
         },
       },
-    },
-  });
-});
+    });
+  },
+  ["articleCount"],
+  {
+    revalidate: 180,
+    tags: ["articleCount"], // 关联的标签
+  }
+);
 
 export default async function Home({
   searchParams,

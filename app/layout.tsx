@@ -3,7 +3,6 @@ import { generateWebsiteJsonLd } from "./lib/metadata";
 import JsonLd from "./components/JsonLd";
 import Image from "next/image";
 import Link from "next/link";
-import WebVitals from "./components/WebVitals";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 export default async function RootLayout({
@@ -84,7 +83,6 @@ export default async function RootLayout({
             </div>
           </header>
           {children}
-          <WebVitals></WebVitals>
         </div>
         {process.env.GA_ID && <GoogleAnalytics gaId={process.env.GA_ID} />}
       </body>

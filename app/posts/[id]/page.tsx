@@ -15,30 +15,44 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import Media from "@/app/components/Media";
 import PublishToWechat from "@/app/components/PublishToWechat";
 import { readableDate } from "@/app/services/dateutils";
-import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 // 设置页面重新验证时间，每小时重新验证一次
 export const revalidate = 3600; // 单位为秒，1小时 = 3600秒
 
-const getTop50Articles = cache(async () => {
-  return await prisma.article.findMany({
-    select: { id: true },
-    orderBy: {
-      publishedAt: "desc",
-    },
-    take: 50,
-  });
-});
+const getTop50Articles = unstable_cache(
+  async () => {
+    return await prisma.article.findMany({
+      select: { id: true },
+      orderBy: {
+        publishedAt: "desc",
+      },
+      take: 50,
+    });
+  },
+  ["top50Articles"],
+  {
+    revalidate: 3600, // 每小时重新生成一次
+    tags: ["top50Articles"], // 关联的标签
+  }
+);
 
-const getArticleById = cache(async (id: string) => {
-  return await prisma.article.findUnique({
-    where: { id },
-    include: {
-      translations: true,
-      wechatPublish: true,
-    },
-  });
-});
+const getArticleById = unstable_cache(
+  async (id: string) => {
+    return await prisma.article.findUnique({
+      where: { id },
+      include: {
+        translations: true,
+        wechatPublish: true,
+      },
+    });
+  },
+  ["articleById"],
+  {
+    revalidate: 3600, // 每小时重新生成一次
+    tags: ["articleById"], // 关联的标签
+  }
+);
 
 // 预生成前50篇文章的静态页面
 export async function generateStaticParams() {
@@ -82,8 +96,12 @@ export async function generateMetadata({
     description: plainTextContent,
     keywords: translation.keywords,
     type: "article",
-    publishedTime: article.publishedAt?.toISOString(),
-    modifiedTime: article.updatedAt?.toISOString(),
+    publishedTime: article.publishedAt
+      ? new Date(article.publishedAt).toISOString()
+      : "",
+    modifiedTime: article.updatedAt
+      ? new Date(article.updatedAt).toISOString()
+      : "",
     authors: article.author ? [article.author] : undefined,
     section: translation.categories?.[0] || "科技",
     image: translation.cover
@@ -93,32 +111,39 @@ export async function generateMetadata({
   });
 }
 
-const getArticle = cache(async (id: string, lang: string) => {
-  const article = await prisma.article.findUnique({
-    where: { id },
-    include: {
-      translations: {
-        where: { lang },
-        include: {
-          references: true,
+const getArticle = unstable_cache(
+  async (id: string, lang: string) => {
+    const article = await prisma.article.findUnique({
+      where: { id },
+      include: {
+        translations: {
+          where: { lang },
+          include: {
+            references: true,
+          },
         },
+        wechatPublish: true,
       },
-      wechatPublish: true,
-    },
-  });
+    });
 
-  if (!article || !article.translations?.length) {
-    return null;
+    if (!article || !article.translations?.length) {
+      return null;
+    }
+
+    // 增加文章阅读量
+    await prisma.article.update({
+      where: { id },
+      data: { views: { increment: 1 } },
+    });
+
+    return article;
+  },
+  ["article"],
+  {
+    revalidate: 3600, // 每小时重新生成一次
+    tags: ["article"], // 关联的标签
   }
-
-  // 增加文章阅读量
-  await prisma.article.update({
-    where: { id },
-    data: { views: { increment: 1 } },
-  });
-
-  return article;
-});
+);
 
 export default async function ArticlePage({
   params,
@@ -129,10 +154,7 @@ export default async function ArticlePage({
 }) {
   // 获取当前语言或默认中文
   const lang = ((await searchParams).lang as string) || "cn"; // 默认中文
-  console.log("Datetime start:", new Date().toISOString());
-
   const article = await getArticle((await params).id, lang);
-  console.log("Datetime end:", new Date().toISOString());
 
   if (!article) {
     notFound();
@@ -140,6 +162,7 @@ export default async function ArticlePage({
 
   const translation = article.translations[0];
 
+  console.log("article: ", article);
   // 获取文章的精简描述用于 JSON-LD
   const plainTextContent =
     translation.summary ||
@@ -150,8 +173,12 @@ export default async function ArticlePage({
     title: translation.title,
     description: plainTextContent,
     authorName: article.author || "科技前沿",
-    publishedTime: article.publishedAt?.toISOString(),
-    modifiedTime: article.updatedAt?.toISOString(),
+    publishedTime: article.publishedAt
+      ? new Date(article.publishedAt).toISOString()
+      : "",
+    modifiedTime: article.updatedAt
+      ? new Date(article.updatedAt).toISOString()
+      : "",
     image: translation.cover
       ? `/api/oss?ossKey=${translation.cover}`
       : undefined,

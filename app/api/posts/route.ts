@@ -95,7 +95,8 @@ export async function GET(request: Request) {
         ],
       },
     };
-  } else if (lang) {
+  }
+  if (lang) {
     // 指定语言筛选但没有搜索条件
     where.translations = {
       some: {
